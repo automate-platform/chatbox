@@ -175,3 +175,6 @@ electron-builder.env
 **/routeTree.gen.ts
 
 .env.sentry-build-plugin
+
+package-lock.json
+public/

@@ -33,6 +33,7 @@ import {
 } from './store-node'
 import { resolveHtmlPath } from './util'
 import * as windowState from './window_state'
+import startNodeRed from '../node-red/node-red'
 
 // Only import knowledge-base module if not on win32 arm64 (libsql doesn't support win32 arm64)
 if (!(process.platform === 'win32' && process.arch === 'arm64')) {
@@ -385,6 +386,7 @@ if (!gotTheLock) {
   app
     .whenReady()
     .then(() => {
+      startNodeRed()
       createWindow()
       ensureTray()
       // Remove this if your app does not use auto updates
