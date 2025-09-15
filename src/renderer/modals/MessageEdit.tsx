@@ -240,7 +240,7 @@ const MessageEdit = NiceModal.create((props: { sessionId: string; msg: Message }
               multiline
               minRows={5}
               maxRows={15}
-              placeholder="prompt"
+              placeholder="THIS IS A PLACEHOLDER"
               value=""
               onChange={(e) => {
                 if (e.target.value) {

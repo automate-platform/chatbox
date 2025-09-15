@@ -123,6 +123,7 @@ function Index() {
     attachments = [],
     links = [],
   }: InputBoxPayload) => {
+    //TODO CHANGE THIS ROUTE TO A MIDDLEWARE
     const newSession = await createSession({
       name: session.name,
       type: 'chat',

@@ -61,6 +61,8 @@ async function convertAssistantContentParts(
   return convertContentParts<TextPart | FilePart>(contentParts, 'file', dependencies)
 }
 
+
+// add options for transformer shit
 export async function convertToCoreMessages(
   messages: Message[],
   options?: { modelSupportVision: boolean }

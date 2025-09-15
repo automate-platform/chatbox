@@ -62,7 +62,7 @@ async function handleSearchResult(
       ? constructMessagesWithKnowledgeBaseResults(messages, result.searchResults)
       : constructMessagesWithSearchResults(messages, result.searchResults)
 
-  return model.chat(await convertToCoreMessages(messagesWithResults), {
+  const response = model.chat(await convertToCoreMessages(messagesWithResults), {
     signal: controller.signal,
     onResultChange: (data) => {
       if (data.contentParts) {
@@ -73,6 +73,7 @@ async function handleSearchResult(
     },
     providerOptions: params.providerOptions,
   })
+  return response;
 }
 
 async function ocrMessages(messages: Message[]) {
@@ -100,6 +101,7 @@ async function ocrMessages(messages: Message[]) {
 /**
  * 这里是供UI层调用，集中处理了模型的联网搜索、工具调用、系统消息等逻辑
  */
+//TODO: ADD ONE MORE PARAMS FOR TRANSFORMER OPTIONS
 export async function streamText(
   model: ModelInterface,
   params: {
@@ -258,6 +260,8 @@ export async function streamText(
     }
     console.debug('tools', tools)
 
+    // TODO ADD APP ID / USER ID
+    console.log("TRANFORMS",coreMessages);
     result = await model.chat(coreMessages, {
       sessionId,
       signal: controller.signal,
@@ -265,6 +269,7 @@ export async function streamText(
       providerOptions: params.providerOptions,
       tools,
     })
+    console.log("RESULT",result);
 
     return result
   } catch (err) {

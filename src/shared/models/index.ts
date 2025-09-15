@@ -14,6 +14,7 @@ import MistralAI from './mistral-ai'
 import Ollama from './ollama'
 import OpenAI from './openai'
 import Perplexity from './perplexity'
+import Custom from './customer'
 import SiliconFlow from './siliconflow'
 import type { ModelInterface } from './types'
 import VolcEngine from './volcengine'
@@ -272,17 +273,18 @@ export function getModel(setting: Settings, config: Config, dependencies: ModelD
       )
     default:
       if (providerBaseInfo.isCustom) {
-        return new CustomOpenAI(
+        return new Custom(
           {
             apiKey: providerSetting.apiKey || '',
             apiHost: formattedApiHost,
-            apiPath: providerSetting.apiPath || '',
-            model,
+            model: model,
+            dalleStyle: setting.dalleStyle || 'vivid',
             temperature: setting.temperature,
             topP: setting.topP,
             maxTokens: setting.maxTokens,
+            injectDefaultMetadata: setting.injectDefaultMetadata,
+            useProxy: false, // 之前的openaiUseProxy已经没有在使用，直接写死false
             stream: setting.stream,
-            useProxy: providerSetting.useProxy,
           },
           dependencies
         )

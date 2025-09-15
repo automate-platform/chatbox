@@ -211,6 +211,7 @@ const InputBox = forwardRef<InputBoxRef, InputBoxProps>(
 
       try {
         // clone params to avoid mutating the original state
+        //WHERE THIS PARAMS IS SENT
         const params = {
           input: messageInput.trim(),
           pictureKeys: pictureKeys && [...pictureKeys],
@@ -481,7 +482,7 @@ const InputBox = forwardRef<InputBoxRef, InputBoxProps>(
             size="sm"
             id={dom.messageInputID}
             ref={inputRef}
-            placeholder={t('Type your question here...') || ''}
+            placeholder="GOTCHA"
             bg="transparent"
             autosize={true}
             minRows={1}

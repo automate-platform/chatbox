@@ -185,7 +185,7 @@ export default abstract class AbstractAISDKModel implements ModelInterface {
       reasoningPart.duration = 1
     }
     contentParts.push(contentPart)
-    options.onResultChange?.({ contentParts })
+    // options.onResultChange?.({ contentParts })
   }
 
   private processToolCalls(
@@ -410,6 +410,7 @@ export default abstract class AbstractAISDKModel implements ModelInterface {
    * @param options - Call options with result change callback
    * @returns The finalized stream text result
    */
+  // handle here
   private finalizeResult(
     contentParts: MessageContentParts,
     result: {
@@ -485,7 +486,8 @@ export default abstract class AbstractAISDKModel implements ModelInterface {
         ...callSettings,
       })
 
-      return this.finalizeResult(contentParts, result, options)
+      const response = this.finalizeResult(contentParts, result, options)
+      return response
     } catch (error) {
       // Handle errors consistently with streaming mode
       this.handleError(error)
@@ -556,6 +558,7 @@ export default abstract class AbstractAISDKModel implements ModelInterface {
   ): Promise<StreamTextResult> {
     const model = this.getChatModel(options)
     const callSettings = this.getCallSettings(options)
+    return this.handleNonStreamingCompletion(model, coreMessages, options, callSettings)
 
     if (this.options.stream === false) {
       return this.handleNonStreamingCompletion(model, coreMessages, options, callSettings)

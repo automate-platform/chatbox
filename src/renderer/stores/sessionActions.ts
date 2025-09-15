@@ -766,6 +766,7 @@ export async function generate(
   options?: { operationType?: 'send_message' | 'regenerate' }
 ) {
   // 获得依赖的数据
+  // this is where it handles message sent
   const store = getDefaultStore()
   const globalSettings = store.get(atoms.settingsAtom)
   const configs = await platform.getConfig()
