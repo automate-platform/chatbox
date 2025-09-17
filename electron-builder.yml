@@ -1,10 +1,11 @@
 productName: Chatbox
 appId: xyz.chatboxapp.app
-asar: true
+asar: false
 asarUnpack: "**\\*.{node,dll}"
 files:
   - dist
-  - node_modules
+  - ./node_modules/**
+  - "!src/node_modules/**"
   - package.json
 
 afterSign: .erb/scripts/notarize.js
@@ -41,11 +42,7 @@ win:
       arch:
         - x64
         - arm64
-  verifyUpdateCodeSignature: false
   artifactName: ${productName}-${version}-Setup.${ext}
-  sign: ./custom_win_sign.js
-  signingHashAlgorithms:
-    - sha256
 
 nsis:
   oneClick: false
@@ -72,6 +69,9 @@ directories:
 
 extraResources:
   - ./assets/**
+  - from: ./public/node-red
+    to: node-red
+
 
 publish:
   - provider: s3
