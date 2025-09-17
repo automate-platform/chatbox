@@ -1,6 +1,6 @@
 productName: Chatbox
 appId: xyz.chatboxapp.app
-asar: false
+asar: true
 asarUnpack: "**\\*.{node,dll}"
 files:
   - dist
