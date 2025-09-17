@@ -20,6 +20,9 @@ const configuration: webpack.Configuration = {
     mode: 'production',
 
     target: 'electron-main',
+    resolve: {
+        extensions: ['.ts', '.js', '.json', '.node'],
+    },
 
     entry: {
         main: path.join(webpackPaths.srcMainPath, 'main.ts'),
@@ -83,6 +86,12 @@ const configuration: webpack.Configuration = {
     node: {
         __dirname: false,
         __filename: false,
+    },
+    module: {
+        rules: [
+            { test: /\.node$/, loader: 'node-loader' },
+            { test: /\.sh$/, type: 'asset/resource', generator: { filename: 'nodered/[name][ext]' } },
+        ],
     },
 }
 
