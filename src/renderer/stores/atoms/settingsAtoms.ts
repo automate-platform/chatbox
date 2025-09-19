@@ -8,6 +8,7 @@ import platform from '../../platform'
 import storage, { StorageKey } from '../../storage'
 
 // settings
+// USE STATE WITH STORE
 const _settingsAtom = atomWithStorage<Settings>(
   StorageKey.Settings,
   {
@@ -80,6 +81,7 @@ export const autoCollapseCodeBlockAtom = focusAtom(settingsAtom, (optic) => opti
 export const shortcutsAtom = focusAtom(settingsAtom, (optic) => optic.prop('shortcuts'))
 export const pasteLongTextAsAFileAtom = focusAtom(settingsAtom, (optic) => optic.prop('pasteLongTextAsAFile'))
 // export const licenseDetailAtom = focusAtom(settingsAtom, (optic) => optic.prop('licenseDetail'))
+export const agentProviderAtom = focusAtom(settingsAtom, (optic) => optic.prop("agentProviders"))
 
 // Related UI state, moved here for proximity to settings
 export const openSettingDialogAtom = atom<SettingWindowTab | null>(null)

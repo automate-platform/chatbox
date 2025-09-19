@@ -66,7 +66,11 @@ export type InputBoxProps = {
   model?: {
     provider: string
     modelId: string
-  }
+  },
+  agent?: {
+    provider: string,
+    agentId: string
+  },
   fullWidth?: boolean
   onSelectModel?(provider: string, model: string): void
   onSubmit?(payload: InputBoxPayload): Promise<void>

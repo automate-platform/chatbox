@@ -44,7 +44,8 @@
     "mobile:android": "npm run mobile:sync:android && npx cap open android",
     "mobile:assets": "npx capacitor-assets generate --ios --android",
     "prepare": "husky",
-    "translate": "i18next && node script/translate.mjs"
+    "translate": "i18next && node script/translate.mjs",
+    "a2a:util:test": "npx ts-node src/shared/utils/manual-test.ts"
   },
   "repository": {
     "type": "git",

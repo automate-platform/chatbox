@@ -1,5 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
 import {
+  AgentCard,
+  AgentProviderSettings,
   type Config,
   ModelProviderEnum,
   ModelProviderType,
@@ -704,4 +706,8 @@ export const SystemProviders: ProviderBaseInfo[] = [
       ],
     },
   },
+]
+
+export const AgentProviders: AgentCard[] = [
+  
 ]

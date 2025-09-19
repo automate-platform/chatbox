@@ -8,6 +8,7 @@ import type { CallChatCompletionOptions } from './types'
 import { createFetchWithProxy, fetchRemoteModels } from './utils/fetch-proxy'
 import { ApiError, ChatboxAIAPIError } from './errors'
 import { createA2ATransformer } from '../transformer/a2aTransformers'
+import { A2AClientInterface } from '../utils/a2a_util'
 
 interface Options {
     apiKey: string
@@ -25,6 +26,8 @@ interface Options {
 export default class Custom extends AbstractAISDKModel {
     public name = 'Custom'
     public options: Options
+    public a2aClient: A2AClientInterface | null = null;
+    public agentUrl: string = "";
     public transformer = createA2ATransformer();
     constructor(options: Options, dependencies: ModelDependencies) {
         super(options, dependencies)
@@ -89,6 +92,12 @@ export default class Custom extends AbstractAISDKModel {
             },
             this.dependencies
         )
+    }
+    public setA2AClient(a2aClientInput: A2AClientInterface) {
+        this.a2aClient = a2aClientInput;
+    }
+    public setAgentUrl(agentUrl: string) {
+        this.agentUrl = agentUrl;
     }
     public async chat(messages: CoreMessage[], options: CallChatCompletionOptions): Promise<StreamTextResult> {
         try {
@@ -209,20 +218,17 @@ export default class Custom extends AbstractAISDKModel {
         options: CallChatCompletionOptions<T>,
         callSettings: CallSettings
     ): Promise<StreamTextResult> {
-        const contentParts: MessageContentParts = []
-
         try {
-            const response = await this.sendLLMRequest(
-                "http://localhost:1880/v1/chat/completions",
-                coreMessages,
-                {
-                    apiKey: this.options.apiKey,
-                    useProxy: this.options.useProxy
-                }
-            );
-
-            const result = await response.json();
+            const transformedRequest = await this.transformer.transformRequestOut(coreMessages, {
+                streaming: this.options.stream || false,
+                ...options
+            });
             //TODO: ADD SESSION ID, USER ID, APP ID
+            //TODO: ADD DEFAULT A2ACLIENT
+            const result = await this.a2aClient?.sendA2AMessageSingle(transformedRequest, this.agentUrl)
+            if (!result) {
+                throw new Error("A2AClient Is Null");
+            }
             const convertedResult:StreamTextResult = await this.transformer.transformResponseIn(result);
             options.onResultChange?.({ contentParts: convertedResult.contentParts })
             return convertedResult

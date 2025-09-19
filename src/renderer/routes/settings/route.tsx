@@ -39,21 +39,21 @@ const ITEMS = [
   },
   ...(featureFlags.mcp
     ? [
-        {
-          key: 'mcp',
-          label: 'MCP',
-          icon: <IconCircleDottedLetterM className="w-full h-full" />,
-        },
-      ]
+      {
+        key: 'mcp',
+        label: 'MCP',
+        icon: <IconCircleDottedLetterM className="w-full h-full" />,
+      },
+    ]
     : []),
   ...(featureFlags.knowledgeBase
     ? [
-        {
-          key: 'knowledge-base',
-          label: 'Knowledge Base',
-          icon: <IconBook className="w-full h-full" />,
-        },
-      ]
+      {
+        key: 'knowledge-base',
+        label: 'Knowledge Base',
+        icon: <IconBook className="w-full h-full" />,
+      },
+    ]
     : []),
   {
     key: 'chat',
@@ -63,12 +63,17 @@ const ITEMS = [
   ...(platform.type === 'mobile'
     ? []
     : [
-        {
-          key: 'hotkeys',
-          label: 'Keyboard Shortcuts',
-          icon: <IconKeyboard className="w-full h-full" />,
-        },
-      ]),
+      {
+        key: 'hotkeys',
+        label: 'Keyboard Shortcuts',
+        icon: <IconKeyboard className="w-full h-full" />,
+      },
+    ]),
+  {
+    key: 'agent_provider',
+    label: 'Agent Providers Setting',
+    icon: <IconAdjustmentsHorizontal className="w-full h-full" />,
+  },
   {
     key: 'general',
     label: 'General Settings',
@@ -99,10 +104,10 @@ function RouteComponent() {
               sx={
                 isSmallScreen
                   ? {
-                      borderColor: theme.palette.action.hover,
-                      borderStyle: 'solid',
-                      borderWidth: 1,
-                    }
+                    borderColor: theme.palette.action.hover,
+                    borderStyle: 'solid',
+                    borderWidth: 1,
+                  }
                   : {}
               }
             >

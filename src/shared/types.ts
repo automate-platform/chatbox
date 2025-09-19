@@ -118,13 +118,13 @@ export interface Message {
   }
   status?: (
     | {
-        type: 'sending_file'
-        mode?: 'local' | 'advanced'
-      }
+      type: 'sending_file'
+      mode?: 'local' | 'advanced'
+    }
     | {
-        type: 'loading_webpage'
-        mode?: 'local' | 'advanced'
-      }
+      type: 'loading_webpage'
+      mode?: 'local' | 'advanced'
+    }
   )[]
 
   wordCount?: number // 当前消息的字数
@@ -367,9 +367,12 @@ export interface MCPSettings {
 export interface Settings extends SessionSettings {
   providers?: {
     [key: string]: ProviderSettings
-  }
-
-  customProviders?: CustomProviderBaseInfo[]
+  },
+  agentProviderSettings?: {
+    [key: string]: AgentProviderSettings
+  },
+  customProviders?: CustomProviderBaseInfo[],
+  agentProviders?: AgentCard[],
 
   favoritedModels?: {
     provider: ModelProvider | string
@@ -446,6 +449,68 @@ export interface Settings extends SessionSettings {
   mcp: MCPSettings
 }
 
+
+export type AgentProviderSettings = Partial<{
+    id: string,
+    agentUrl: string,
+    name: string,
+    [key: string]: any
+}>
+
+export type AgentCard = Partial <{
+  /**
+   * A unique identifier for the agent.
+   */
+  id: string;
+
+  /**
+   * A unique identifier for the agent in the storage.
+   */
+  chatboxSettingId: string,
+
+  /**
+   * The human-readable name of the agent (e.g., "Recipe Bot").
+   */
+  name: string;
+
+  /**
+   * A brief description of the agent's purpose or capabilities.
+   */
+  description?: string;
+
+  /**
+   * The base URL where the agent's services can be accessed.
+   */
+  baseUrl: string;
+
+  /**
+   * An array of the agent's supported capabilities or services,
+   * each with a name and a description.
+   */
+  capabilities?: Array<{
+    name: string;
+    description?: string;
+    // Additional properties specific to the capability can be added here
+  }>;
+
+  /**
+   * Contact information for the agent's developer or owner.
+   */
+  contact?: {
+    email?: string;
+    url?: string;
+  };
+
+  /**
+   * Version of the Agent Card specification being used.
+   */
+  specVersion?: string;
+
+  /**
+   * Timestamp of when the Agent Card was last updated.
+   */
+  lastUpdated?: string;
+}>
 export interface ShortcutSetting {
   // windowQuickToggle: string // 快速切换窗口显隐的快捷键
   quickToggle: ShortcutToggleWindowValue
