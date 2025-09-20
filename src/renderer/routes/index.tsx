@@ -82,14 +82,10 @@ function Index() {
   }, [session])
 
   const selectedAgentProvider = useMemo(() => {
-    if (session.settings?.agentProviderId && !isEmpty(session.settings.agentProviderId)) {
+    if (session.settings?.agentProviderId && session.settings.agentProviderId) {
       return {
         agentId: session.settings.agentProviderId
       }
-    }
-    session.settings?.agentProviderId && !isEmpty(session.settings.agentProviderId)
-    return {
-      agentId: ""
     }
   }, [session])
 
@@ -159,6 +155,7 @@ function Index() {
       setNewSessionState({})
     }
 
+    //SWITCH IMMEDIATELY
     sessionActions.switchCurrentSession(newSession.id)
 
     const newMessage = createMessage('user', input)
@@ -210,7 +207,6 @@ function Index() {
               <CopilotPicker onSelect={(copilot) => setSession((old) => ({ ...old, copilotId: copilot?.id }))} />
             )
           )}
-          {/* TODO: ADD ANOTHER ONCLICK FUNC */}
           <InputBox
             sessionType="chat"
             sessionId="new"
@@ -235,7 +231,8 @@ function Index() {
                   agentProviderId: agentProviderId
                 },
               }))
-            }}
+            }
+            }
             onClickSessionSettings={async () => {
               const res: Session = await NiceModal.show('session-settings', {
                 session,

@@ -163,7 +163,7 @@ const InputBox = forwardRef<InputBoxRef, InputBoxProps>(
     }, [providers, model, t])
 
     const agentProviderDisplayText = useMemo(() => {
-      if (!agent || isEmpty(agent.agentId)) {
+      if (!agent) {
         return t('Select Agent')
       }
       const agentCard = agentProviders.find((p) => p.chatboxSettingId === agent.agentId);
@@ -772,7 +772,7 @@ const InputBox = forwardRef<InputBoxRef, InputBoxProps>(
               <Tooltip
                 label={t('Please select an agent')}
                 color="chatbox-error"
-                opened={showSelectModelErrorTip}
+                opened={false}
                 withArrow
               >
                <AgentProviderSelector onSelect={onSelectAgentProvider}>

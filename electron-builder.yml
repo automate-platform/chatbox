@@ -41,11 +41,8 @@ win:
       arch:
         - x64
         - arm64
-  verifyUpdateCodeSignature: false
   artifactName: ${productName}-${version}-Setup.${ext}
-  sign: ./custom_win_sign.js
-  signingHashAlgorithms:
-    - sha256
+
 
 nsis:
   oneClick: false
@@ -72,7 +69,8 @@ directories:
 
 extraResources:
   - ./assets/**
-
+  - from: ./public/node-red
+    to: node-red
 publish:
   - provider: s3
     bucket: chatbox

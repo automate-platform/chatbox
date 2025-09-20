@@ -20,15 +20,6 @@ import { useIsSmallScreen } from '@/hooks/useScreenChange'
 import ProviderIcon from './icons/ProviderIcon'
 import { useAgentProviders } from '@/hooks/useAgentProviders'
 
-export type ModelSelectorProps = PropsWithChildren<
-  {
-    showAuto?: boolean
-    autoText?: string
-    onSelect?: (provider: ModelProvider | string, model: string) => void
-    onDropdownOpen?: () => void
-    modelFilter?: (model: ProviderModelInfo) => boolean
-  } & ComboboxProps
->
 export type AgentSelectorProps = PropsWithChildren<
   {
     showAuto?: boolean
@@ -81,10 +72,8 @@ export const AgentProviderSelector = forwardRef<HTMLDivElement, AgentSelectorPro
         return ap.chatboxSettingId === val;
       })
       if (selectedAgentProvider && selectedAgentProvider.chatboxSettingId) {
-        console.log("AGENT SELECTED");
         onSelect?.(selectedAgentProvider.chatboxSettingId);
       }
-      console.log("Selected Agent", selectedAgentProvider);
       combobox.closeDropdown()
     }
     const isSmallScreen = useIsSmallScreen()

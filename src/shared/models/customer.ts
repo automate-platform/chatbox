@@ -37,6 +37,7 @@ export default class Custom extends AbstractAISDKModel {
         const { apiHost } = normalizeOpenAIApiHostAndPath(options)
         this.options = { ...options, apiHost }
         const agentProviders = this.settings.agentProviders;
+        console.log("MODEL GENERATED",this.settings);
         this.selectedAgent = agentProviders?.find(item => item.chatboxSettingId === this.settings.agentProviderId && !isEmpty(item.chatboxSettingId)) || null;
     }
 

@@ -75,60 +75,56 @@ function AgentProviderSettings({ agentProviderId }: { agentProviderId: string })
   const a2aClient:A2AClientInterface = useA2AClient();
   const { agentProvidersSetting, setAgentProviderSettings } = useAgentProviderSettings(agentProviderId)
   const {agentCard: baseInfo, setAgentCard: setBaseInfo} = useAgentCard(agentProviderId);
-  // const baseInfo = [...AgentProviders].find((p) => p.chatboxSettingId === agentProviderId);
   const [currentUrl, setCurrentUrl] = useState<string>(agentProvidersSetting?.agentUrl || "");
   const [currentAgentCard, setAgentCardInfo] = useState<AgentCard | any>(baseInfo);
 
   const [agentCardChecking, setAgentCardChecking] = useState(false);
   const [agentCardSaving, setAgentCardSaving] = useState(false);
 
+  // ERROR HANDLDING
+  const [errorResponse, setErrorResponse] = useState<string>("");
+  const [isError, setIsError] = useState<boolean>(false);
+
   const handleAgentCardUrlChange = (e: ChangeEvent<HTMLInputElement>) => {
     setCurrentUrl(e.currentTarget.value);
+  }
+  const handleError = (e:Error) => {
+    setErrorResponse(e.message);
+    setIsError(true);
   }
   const handleAgentCardUrlSave = async () => {
     try {
       setAgentCardSaving(true);
-      // await new Promise((resolve) => {
-      //   setTimeout(() => {
-      //     console.log(`Mock: Agent card displayed for provider ${agentProviderId}`);
-      //     resolve(undefined);
-      //   }, 1000); // Default 1 second if time not provided
-      // });
       const agentCard = await a2aClient.getAgentCard(currentUrl);
       agentCard.chatboxSettingId = agentProviderId;
       agentCard.baseUrl = currentUrl;
-      // mockAgentCard.chatboxSettingId = agentProviderId;
       setBaseInfo(agentCard);
       setAgentCardInfo(agentCard);
       setAgentProviderSettings({
         agentUrl: currentUrl,
       })
+      setIsError(false);
     }
-    catch (e) {
-      console.log(e);
+    catch (e: any) {
+      handleError(e);
     }
     finally {
       setAgentCardSaving(false);
     }
-    //TODO: ADD METHOD FOR CALLING AGENT CARD => DISPLAY
   }
   const checkAgentCardInfo = async () => {
     //TODO: BETTER HANDLE ERROR + LOG ERROR
     try {
       setAgentCardChecking(true);
-      // await new Promise((resolve) => {
-      //   setTimeout(() => {
-      //     console.log(`Mock: Agent card displayed for provider ${agentProviderId}`);
-      //     resolve(undefined);
-      //   }, 1000); // Default 1 second if time not provided
-      // });
       const agentCard = await a2aClient.getAgentCard(currentUrl);
       setAgentCardInfo(({
         ...agentCard
       }))
+      setIsError(false);
     }
     catch (e: any) {
       console.log(e)
+      handleError(e);
     }
     finally {
       setAgentCardChecking(false);
@@ -148,7 +144,7 @@ function AgentProviderSettings({ agentProviderId }: { agentProviderId: string })
           onConfirm={() => {
             setSettings(
               {
-                agentProviders: settings.agentProviders?.filter((p) => p.id !== baseInfo?.chatboxSettingId)
+                agentProviders: settings.agentProviders?.filter((p) => p.chatboxSettingId !== baseInfo?.chatboxSettingId)
               }
             )
             //TODO: DO RESEARCH ON TANSTACK NAVIGATION
@@ -195,7 +191,14 @@ function AgentProviderSettings({ agentProviderId }: { agentProviderId: string })
             </Button>
           </Flex>
           {
-            !isEmpty(currentAgentCard) && (
+            isError && (
+              <Text span c="chatbox-error">
+                {errorResponse}
+              </Text>
+            )
+          }
+          {
+            !isEmpty(currentAgentCard) && !isError && (
               <Text span c="chatbox-success">
                 {JSON.stringify(currentAgentCard)}
               </Text>

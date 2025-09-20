@@ -4,7 +4,7 @@ import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp'
 import { Box, ButtonGroup, IconButton } from '@mui/material'
 import { createFileRoute } from '@tanstack/react-router'
 import { useAtomValue, useSetAtom } from 'jotai'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { createMessage, type ModelProvider } from 'src/shared/types'
 import Header from '@/components/Header'
 import InputBox from '@/components/InputBox'
@@ -27,7 +27,16 @@ function RouteComponent() {
   const lastMessage = currentSession?.messages.length
     ? currentSession.messages[currentSession.messages.length - 1]
     : null
-
+  const selectedAgentProvider = useMemo(() => {
+    if (!currentSession) {
+      return;
+    }
+    if (currentSession.settings?.agentProviderId && currentSession.settings.agentProviderId) {
+      return {
+        agentId: currentSession.settings.agentProviderId
+      }
+    }
+  }, [currentSession])
   useEffect(() => {
     setTimeout(() => {
       scrollActions.scrollToBottom('auto') // 每次启动时自动滚动到底部
@@ -69,11 +78,12 @@ function RouteComponent() {
         model={
           currentSession.settings?.provider && currentSession.settings?.modelId
             ? {
-                provider: currentSession.settings.provider,
-                modelId: currentSession.settings.modelId,
-              }
+              provider: currentSession.settings.provider,
+              modelId: currentSession.settings.modelId,
+            }
             : undefined
         }
+        agent={selectedAgentProvider}
         onStartNewThread={() => {
           sessionActions.startNewThread()
           return true
@@ -82,6 +92,19 @@ function RouteComponent() {
           sessionActions.removeCurrentThread(currentSessionId)
           return true
         }}
+        onSelectAgentProvider={(agentProviderId) => {
+          if (!currentSession) {
+            return
+          }
+          saveSession({
+            id: currentSession.id,
+            settings: {
+              ...(currentSession.settings || {}),
+              agentProviderId: agentProviderId
+            },
+          })
+        }
+        }
         onSelectModel={(provider: ModelProvider, modelId: string) => {
           if (!currentSession) {
             return
@@ -146,17 +169,17 @@ function ScrollButtons() {
         sx={
           language === 'ar'
             ? {
-                position: 'absolute',
-                left: '0.4rem',
-                top: '-5.5rem',
-                opacity: 0.6,
-              }
+              position: 'absolute',
+              left: '0.4rem',
+              top: '-5.5rem',
+              opacity: 0.6,
+            }
             : {
-                position: 'absolute',
-                right: '0.4rem',
-                top: '-5.5rem',
-                opacity: 0.6,
-              }
+              position: 'absolute',
+              right: '0.4rem',
+              top: '-5.5rem',
+              opacity: 0.6,
+            }
         }
         orientation="vertical"
       >

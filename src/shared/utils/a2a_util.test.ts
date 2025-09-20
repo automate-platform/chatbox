@@ -232,10 +232,10 @@ export async function testA2AClientInteractive(
     requestBody: A2ARequest,
     baseAgentUrl: string
 ): Promise<void> {
-    console.log('🚀 Testing A2AClient with:');
-    console.log('📤 Request Body:', JSON.stringify(requestBody, null, 2));
-    console.log('🌐 Base Agent URL:', baseAgentUrl);
-    console.log('⏳ Sending request...\n');
+    console.log('Testing A2AClient with:');
+    console.log('Request Body:', JSON.stringify(requestBody, null, 2));
+    console.log('Base Agent URL:', baseAgentUrl);
+    console.log('Sending request...\n');
 
     const client = new A2AClient();
 
@@ -244,11 +244,11 @@ export async function testA2AClientInteractive(
         const response = await client.sendA2AMessageSingle(requestBody, baseAgentUrl);
         const endTime = Date.now();
 
-        console.log('✅ Success!');
-        console.log('⏱️  Response Time:', `${endTime - startTime}ms`);
-        console.log('📥 Response:', JSON.stringify(response, null, 2));
+        console.log('Success!');
+        console.log('Response Time:', `${endTime - startTime}ms`);
+        console.log('Response:', JSON.stringify(response, null, 2));
     } catch (error) {
-        console.log('❌ Error occurred:');
+        console.log('Error occurred:');
         console.error(error);
     }
 }
@@ -257,7 +257,7 @@ export async function testA2AClientInteractive(
 export function runExampleTests(): void {
     console.log('Running example A2A tests...\n');
 
-    console.log('💡 Example requests you can use:');
+    console.log('Example requests you can use:');
     console.log('1. SendMessage request:');
     console.log(JSON.stringify({
         id: "example-1",
@@ -291,10 +291,10 @@ export function runExampleTests(): void {
         }
     }, null, 2));
 
-    console.log('\n💡 Example URLs to test with:');
+    console.log('\nExample URLs to test with:');
     console.log('- https://your-agent.example.com/api');
     console.log('- http://localhost:3000/api/a2a');
 
-    console.log('\n💡 To test manually, call:');
+    console.log('\nTo test manually, call:');
     console.log('testA2AClientInteractive(requestObject, "YOUR_AGENT_URL")');
 }

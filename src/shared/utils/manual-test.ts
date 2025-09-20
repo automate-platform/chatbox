@@ -106,11 +106,11 @@ async function manualTest() {
     }
 
     // Test Agent Card endpoint
-    console.log(`\n📋 Running: ${agentCardTest.name}`);
+    console.log(`\nRunning: ${agentCardTest.name}`);
     console.log('─' .repeat(30));
 
-    console.log('📤 Agent Card URL:', `${agentCardTest.url}/.well-known/agent.json`);
-    console.log('\n⏳ Fetching agent card...');
+    console.log('Agent Card URL:', `${agentCardTest.url}/.well-known/agent.json`);
+    console.log('\nFetching agent card...');
 
     const startTime = Date.now();
 
@@ -118,17 +118,17 @@ async function manualTest() {
         const agentCard = await client.getAgentCard(agentCardTest.url);
         const endTime = Date.now();
 
-        console.log('✅ SUCCESS!');
-        console.log(`⏱️  Response time: ${endTime - startTime}ms`);
-        console.log('📥 Agent Card:');
+        console.log('SUCCESS!');
+        console.log(`Response time: ${endTime - startTime}ms`);
+        console.log('Agent Card:');
         console.log(JSON.stringify(agentCard, null, 2));
 
     } catch (error) {
         const endTime = Date.now();
 
-        console.log('❌ ERROR!');
-        console.log(`⏱️  Time: ${endTime - startTime}ms`);
-        console.log('💥 Error details:');
+        console.log('ERROR!');
+        console.log(`Time: ${endTime - startTime}ms`);
+        console.log('Error details:');
         console.error(error);
     }
 
