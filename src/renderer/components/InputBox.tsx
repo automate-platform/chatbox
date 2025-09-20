@@ -167,6 +167,9 @@ const InputBox = forwardRef<InputBoxRef, InputBoxProps>(
         return t('Select Agent')
       }
       const agentCard = agentProviders.find((p) => p.chatboxSettingId === agent.agentId);
+      if (!agentCard) {
+        return t('Select Agent')
+      }
       return `${agentCard?.name}`
     }, [agentProviders, agent, t])
 
