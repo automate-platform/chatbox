@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/react'
 import { getDefaultStore } from 'jotai'
-import { identity, pickBy, throttle } from 'lodash'
+import { identity, isEmpty, pickBy, throttle } from 'lodash'
 import { getModel } from 'src/shared/models'
 import type { onResultChangeWithCancel } from 'src/shared/models/types'
 import { v4 as uuidv4 } from 'uuid'
@@ -65,6 +65,7 @@ import {
   NetworkError,
 } from '../../shared/models/errors'
 import {
+  AgentCard,
   createMessage,
   type ExportChatFormat,
   type ExportChatScope,
@@ -91,6 +92,8 @@ import * as atoms from './atoms'
 import * as scrollActions from './scrollActions'
 import { clearConversations, copySession, createSession, getSession, saveSession } from './sessionStorageMutations'
 import * as settingActions from './settingActions'
+import Custom from 'src/shared/models/customer'
+import { A2AClient } from 'src/shared/utils/a2a_util'
 
 /**
  * 创建一个新的会话
@@ -565,7 +568,7 @@ export async function submitNewUserMessage(params: {
   const store = getDefaultStore()
   const webBrowsing = store.get(atoms.inputBoxWebBrowsingModeAtom)
 
-  // 如果存在附件，现在发送消息中构建空白的文件信息，用于占位，等待上传完成后再修改
+    // 如果存在附件，现在发送消息中构建空白的文件信息，用于占位，等待上传完成后再修改
   if (attachments && attachments.length > 0) {
     newUserMsg.files = attachments.map((f, ix) => ({
       id: ix.toString(),
@@ -1208,6 +1211,7 @@ export function initEmptyChatSession(): Omit<Session, 'id'> {
         ? {
             provider: settings.defaultChatModel.provider,
             modelId: settings.defaultChatModel.model,
+            agentProviderId: settings.agentProviderId || "",
           }
         : chatSessionSettings),
     },

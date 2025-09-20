@@ -1,6 +1,6 @@
 import { createOpenAI } from '@ai-sdk/openai'
 import { APICallError, CoreMessage, extractReasoningMiddleware, ToolSet, wrapLanguageModel } from 'ai'
-import type { MessageContentParts, ProviderModelInfo, StreamTextResult } from '../types'
+import type { AgentCard, MessageContentParts, ProviderModelInfo, StreamTextResult } from '../types'
 import type { ModelDependencies } from '../types/adapters'
 import { normalizeOpenAIApiHostAndPath } from '../utils/llm_utils'
 import AbstractAISDKModel, { CallSettings } from './abstract-ai-sdk'
@@ -8,7 +8,9 @@ import type { CallChatCompletionOptions } from './types'
 import { createFetchWithProxy, fetchRemoteModels } from './utils/fetch-proxy'
 import { ApiError, ChatboxAIAPIError } from './errors'
 import { createA2ATransformer } from '../transformer/a2aTransformers'
-import { A2AClientInterface } from '../utils/a2a_util'
+import { A2AClient, A2AClientInterface } from '../utils/a2a_util'
+import { getCurrentSessionMergedSettings } from '@/stores/sessionActions'
+import { isEmpty } from 'lodash'
 
 interface Options {
     apiKey: string
@@ -26,13 +28,16 @@ interface Options {
 export default class Custom extends AbstractAISDKModel {
     public name = 'Custom'
     public options: Options
-    public a2aClient: A2AClientInterface | null = null;
-    public agentUrl: string = "";
+    public a2aClient: A2AClientInterface = new A2AClient();
     public transformer = createA2ATransformer();
+    private settings = getCurrentSessionMergedSettings();
+    private selectedAgent: AgentCard | null = null;
     constructor(options: Options, dependencies: ModelDependencies) {
         super(options, dependencies)
         const { apiHost } = normalizeOpenAIApiHostAndPath(options)
         this.options = { ...options, apiHost }
+        const agentProviders = this.settings.agentProviders;
+        this.selectedAgent = agentProviders?.find(item => item.chatboxSettingId === this.settings.agentProviderId && !isEmpty(item.chatboxSettingId)) || null;
     }
 
     static isSupportTextEmbedding() {
@@ -93,13 +98,14 @@ export default class Custom extends AbstractAISDKModel {
             this.dependencies
         )
     }
-    public setA2AClient(a2aClientInput: A2AClientInterface) {
-        this.a2aClient = a2aClientInput;
-    }
-    public setAgentUrl(agentUrl: string) {
-        this.agentUrl = agentUrl;
-    }
     public async chat(messages: CoreMessage[], options: CallChatCompletionOptions): Promise<StreamTextResult> {
+        console.log("CHAT CALLED");
+        // Create a new Error object to capture the current stack trace
+        const error = new Error();
+        // The 'stack' property contains the call stack as a string
+        const callStack = error.stack;
+        console.log("Call Stack:");
+        console.log(callStack);
         try {
             return await this._callChatCompletionCustom(messages, options)
         } catch (e) {
@@ -201,16 +207,14 @@ export default class Custom extends AbstractAISDKModel {
     private async _callChatCompletionCustom<T extends ToolSet>(
         coreMessages: CoreMessage[],
         options: CallChatCompletionOptions<T>
-      ): Promise<StreamTextResult> {
-        const model = this.getChatModel()
-        const callSettings = this.getCallSettings(options)
-        return this.handleNonStreamingCompletionCustom(model, coreMessages, options, callSettings)
+    ): Promise<StreamTextResult> {
+        return this.handleNonStreamingCompletionCustom(null, coreMessages, options, {})
         // if (this.options.stream === false) {
         //   return this.handleNonStreamingCompletionCustom(model, coreMessages, options, callSettings)
         // }
-    
+
         // return this.handleStreamingCompletion(model, coreMessages, options, callSettings)
-      }
+    }
 
     private async handleNonStreamingCompletionCustom<T extends ToolSet>(
         model: any, // Using 'any' for LanguageModelV1
@@ -219,17 +223,18 @@ export default class Custom extends AbstractAISDKModel {
         callSettings: CallSettings
     ): Promise<StreamTextResult> {
         try {
+            //TODO: ADD APP ID
             const transformedRequest = await this.transformer.transformRequestOut(coreMessages, {
                 streaming: this.options.stream || false,
+                contextId: options.sessionId,
                 ...options
             });
-            //TODO: ADD SESSION ID, USER ID, APP ID
-            //TODO: ADD DEFAULT A2ACLIENT
-            const result = await this.a2aClient?.sendA2AMessageSingle(transformedRequest, this.agentUrl)
-            if (!result) {
+            if (!this.selectedAgent || !this.selectedAgent.baseUrl) {
+                console.log(this.a2aClient, this.selectedAgent?.baseUrl);
                 throw new Error("A2AClient Is Null");
             }
-            const convertedResult:StreamTextResult = await this.transformer.transformResponseIn(result);
+            const result = await this.a2aClient.sendA2AMessageSingle(transformedRequest, this.selectedAgent.baseUrl);
+            const convertedResult: StreamTextResult = await this.transformer.transformResponseIn(result);
             options.onResultChange?.({ contentParts: convertedResult.contentParts })
             return convertedResult
         } catch (error) {

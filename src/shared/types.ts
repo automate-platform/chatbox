@@ -183,7 +183,8 @@ export type SessionSettings = Partial<{
   stream: boolean
   dalleStyle: 'vivid' | 'natural'
   imageGenerateNum: number // 生成图片的数量
-  providerOptions?: ProviderOptions
+  providerOptions?: ProviderOptions,
+  agentProviderId: string
 }>
 
 export interface Session {

@@ -26,6 +26,7 @@ import {
 import * as sessionActions from '@/stores/sessionActions'
 import { initEmptyChatSession } from '@/stores/sessionActions'
 import { createSession, getSessionAsync } from '@/stores/sessionStorageMutations'
+import { isEmpty } from 'lodash'
 
 export const Route = createFileRoute('/')({
   component: Index,
@@ -64,6 +65,7 @@ function Index() {
           ? {
               provider: settings.defaultChatModel.provider,
               modelId: settings.defaultChatModel.model,
+              agentProviderId: settings.agentProviderId || "",
             }
           : chatSessionSettings),
       },
@@ -76,6 +78,18 @@ function Index() {
         provider: session.settings.provider,
         modelId: session.settings.modelId,
       }
+    }
+  }, [session])
+
+  const selectedAgentProvider = useMemo(() => {
+    if (session.settings?.agentProviderId && !isEmpty(session.settings.agentProviderId)) {
+      return {
+        agentId: session.settings.agentProviderId
+      }
+    }
+    session.settings?.agentProviderId && !isEmpty(session.settings.agentProviderId)
+    return {
+      agentId: ""
     }
   }, [session])
 
@@ -123,7 +137,6 @@ function Index() {
     attachments = [],
     links = [],
   }: InputBoxPayload) => {
-    //TODO CHANGE THIS ROUTE TO A MIDDLEWARE
     const newSession = await createSession({
       name: session.name,
       type: 'chat',
@@ -197,11 +210,12 @@ function Index() {
               <CopilotPicker onSelect={(copilot) => setSession((old) => ({ ...old, copilotId: copilot?.id }))} />
             )
           )}
-
+          {/* TODO: ADD ANOTHER ONCLICK FUNC */}
           <InputBox
             sessionType="chat"
             sessionId="new"
             model={selectedModel}
+            agent={selectedAgentProvider}
             fullWidth
             onSelectModel={(p, m) =>
               setSession((old) => ({
@@ -213,6 +227,15 @@ function Index() {
                 },
               }))
             }
+            onSelectAgentProvider={(agentProviderId) => {
+              setSession((old) => ({
+                ...old,
+                settings: {
+                  ...(old.settings || {}),
+                  agentProviderId: agentProviderId
+                },
+              }))
+            }}
             onClickSessionSettings={async () => {
               const res: Session = await NiceModal.show('session-settings', {
                 session,

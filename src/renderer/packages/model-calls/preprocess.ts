@@ -36,6 +36,7 @@ async function doOCR(model: ModelInterface, imageData: string) {
       { type: 'image', image: imageData, mimeType: 'image/png' },
     ],
   }
+  console.log("DOOCR")
   const chatResult = await model.chat([msg], {})
   const text = chatResult.contentParts
     .filter((p) => p.type === 'text')

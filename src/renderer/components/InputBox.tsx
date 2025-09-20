@@ -17,7 +17,7 @@ import {
   IconWorld,
 } from '@tabler/icons-react'
 import { useAtom, useAtomValue } from 'jotai'
-import _, { pick } from 'lodash'
+import _, { isEmpty, pick } from 'lodash'
 import type React from 'react'
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
@@ -46,6 +46,8 @@ import KnowledgeBaseMenu from './knowledge-base/KnowledgeBaseMenu'
 import ModelSelector from './ModelSelectorNew'
 import MCPMenu from './mcp/MCPMenu'
 import { Keys } from './Shortcut'
+import { useAgentProviders } from '@/hooks/useAgentProviders'
+import AgentProviderSelector from './AgentProviderSelector'
 
 export type InputBoxPayload = {
   input: string
@@ -68,11 +70,11 @@ export type InputBoxProps = {
     modelId: string
   },
   agent?: {
-    provider: string,
     agentId: string
   },
   fullWidth?: boolean
   onSelectModel?(provider: string, model: string): void
+  onSelectAgentProvider?(agentProviderId: string): void
   onSubmit?(payload: InputBoxPayload): Promise<void>
   onStopGenerating?(): boolean
   onStartNewThread?(): boolean
@@ -87,10 +89,12 @@ const InputBox = forwardRef<InputBoxRef, InputBoxProps>(
       sessionType = 'chat',
       generating = false,
       model,
+      agent,
       fullWidth = false,
       onSelectModel,
       onSubmit,
       onStopGenerating,
+      onSelectAgentProvider,
       onStartNewThread,
       onRollbackThread,
       onClickSessionSettings,
@@ -145,6 +149,7 @@ const InputBox = forwardRef<InputBoxRef, InputBoxProps>(
     )
 
     const { providers } = useProviders()
+    const { agentProviders } = useAgentProviders();
     const modelSelectorDisplayText = useMemo(() => {
       if (!model) {
         return t('Select Model')
@@ -156,6 +161,14 @@ const InputBox = forwardRef<InputBoxRef, InputBoxProps>(
       )
       return `${modelInfo?.nickname || model.modelId}`
     }, [providers, model, t])
+
+    const agentProviderDisplayText = useMemo(() => {
+      if (!agent || isEmpty(agent.agentId)) {
+        return t('Select Agent')
+      }
+      const agentCard = agentProviders.find((p) => p.chatboxSettingId === agent.agentId);
+      return `${agentCard?.name}`
+    }, [agentProviders, agent, t])
 
     const [showSelectModelErrorTip, setShowSelectModelErrorTip] = useState(false)
     useEffect(() => {
@@ -756,7 +769,29 @@ const InputBox = forwardRef<InputBoxRef, InputBoxProps>(
                   </ModelSelector>
                 )}
               </Tooltip>
-
+              <Tooltip
+                label={t('Please select an agent')}
+                color="chatbox-error"
+                opened={showSelectModelErrorTip}
+                withArrow
+              >
+               <AgentProviderSelector onSelect={onSelectAgentProvider}>
+                  <Flex
+                    gap="xxs"
+                    px={isSmallScreen ? 0 : 'xs'}
+                    align="center"
+                    className={cn('cursor-pointer hover:bg-slate-400/25 rounded-lg', !isSmallScreen && 'py-1')}
+                  >
+                    <Text size={isSmallScreen ? 'xs' : 'sm'} className="line-clamp-1">
+                      {agentProviderDisplayText}
+                    </Text>
+                    <IconSelector
+                      size={20}
+                      className="flex-[0_0_auto] text-[var(--mantine-color-chatbox-tertiary-text)]"
+                    />
+                  </Flex>
+                </AgentProviderSelector>
+              </Tooltip>
               <ActionIcon
                 disabled={disableSubmit && !generating}
                 radius={18}
@@ -765,8 +800,8 @@ const InputBox = forwardRef<InputBoxRef, InputBoxProps>(
                 className={cn(
                   // 'mt-[-6px] mb-[2px]',
                   disableSubmit &&
-                    !generating &&
-                    '!text-white !bg-[var(--mantine-color-chatbox-background-tertiary-text)]'
+                  !generating &&
+                  '!text-white !bg-[var(--mantine-color-chatbox-background-tertiary-text)]'
                 )}
               >
                 {generating ? <IconPlayerStopFilled size={20} /> : <IconArrowUp size={20} />}

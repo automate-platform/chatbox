@@ -74,7 +74,6 @@ function AgentProviderSettings({ agentProviderId }: { agentProviderId: string })
   const { settings, setSettings } = useSettings()
   const a2aClient:A2AClientInterface = useA2AClient();
   const { agentProvidersSetting, setAgentProviderSettings } = useAgentProviderSettings(agentProviderId)
-  console.log(agentProviderId);
   const {agentCard: baseInfo, setAgentCard: setBaseInfo} = useAgentCard(agentProviderId);
   // const baseInfo = [...AgentProviders].find((p) => p.chatboxSettingId === agentProviderId);
   const [currentUrl, setCurrentUrl] = useState<string>(agentProvidersSetting?.agentUrl || "");
@@ -97,6 +96,7 @@ function AgentProviderSettings({ agentProviderId }: { agentProviderId: string })
       // });
       const agentCard = await a2aClient.getAgentCard(currentUrl);
       agentCard.chatboxSettingId = agentProviderId;
+      agentCard.baseUrl = currentUrl;
       // mockAgentCard.chatboxSettingId = agentProviderId;
       setBaseInfo(agentCard);
       setAgentCardInfo(agentCard);

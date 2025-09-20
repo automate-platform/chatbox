@@ -4,8 +4,8 @@ import { convertToCoreMessages } from './message-utils'
 
 export { streamText } from './stream-text'
 
-export async function generateText(model: ModelInterface, messages: Message[]) {
-  return model.chat(await convertToCoreMessages(messages), {})
+export async function generateText(model: ModelInterface, messages: Message[], sessionID?: string) {
+  return model.chat(await convertToCoreMessages(messages), {sessionId: sessionID})
 }
 
 export async function generateImage(

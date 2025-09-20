@@ -34,7 +34,6 @@ export const ModelSelector = forwardRef<HTMLDivElement, ModelSelectorProps>(
     const { t } = useTranslation()
     const navigate = useNavigate()
     const { providers, favoritedModels, favoriteModel, unfavoriteModel, isFavoritedModel } = useProviders()
-
     const [search, setSearch] = useState('')
     const filteredProviders = useMemo(
       () =>

@@ -36,6 +36,7 @@ export class A2ATransformer implements Transformer {
       // TODO: ADD NODE-RED hook
 
       const isStreaming = options.streaming || false;
+      return this.createSendMessageRequest(requestId, a2aMessage, options);
 
       if (isStreaming) {
         return this.createStreamingMessageRequest(requestId, a2aMessage, options);
@@ -186,12 +187,8 @@ export class A2ATransformer implements Transformer {
     if ('error' in response) {
       throw new Error(`A2A Error: ${response.error.message}`);
     }
-
     if ('result' in response) {
       const result = response.result;
-
-
-
       if (typeof result === 'object' && result && 'kind' in result && result.kind === 'message') {
         const message = result as Message;
         return message.parts
@@ -202,19 +199,21 @@ export class A2ATransformer implements Transformer {
 
       if (typeof result === 'object' && result && 'kind' in result && result.kind === 'task') {
         const task = result as any;
-        if (task.artifacts) {
-          const lastArtiffacts = task.artifacts[task.artifacts.length - 1];
-          if (lastArtiffacts && lastArtiffacts.parts) {
-            return lastArtiffacts.parts
+        if (task.history && Array.isArray(task.history)) {
+          console.log("GET MESSAGE FROM TASK HISTORY");
+          const lastMessage = task.history[task.history.length - 1];
+          console.log("LAST MESSAGE FROM TASK HISTORY", lastMessage);
+          if (lastMessage && lastMessage.parts) {
+            return lastMessage.parts
               .filter((part: Part): part is TextPart => part.kind === 'text')
               .map((part: TextPart) => part.text)
               .join('\n');
           }
         }
-        if (task.history && Array.isArray(task.history)) {
-          const lastMessage = task.history[task.history.length - 1];
-          if (lastMessage && lastMessage.parts) {
-            return lastMessage.parts
+        if (task.artifacts) {
+          const lastArtiffacts = task.artifacts[task.artifacts.length - 1];
+          if (lastArtiffacts && lastArtiffacts.parts) {
+            return lastArtiffacts.parts
               .filter((part: Part): part is TextPart => part.kind === 'text')
               .map((part: TextPart) => part.text)
               .join('\n');
@@ -230,7 +229,6 @@ export class A2ATransformer implements Transformer {
         return JSON.stringify(result, null, 2);
       }
     }
-
     return '';
   }
 

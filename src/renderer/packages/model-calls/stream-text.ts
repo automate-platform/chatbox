@@ -44,6 +44,7 @@ async function handleSearchResult(
   params: { providerOptions?: ProviderOptions }
 ) {
   if (!result?.searchResults?.length || result.type === 'none') {
+    console.log("HANDLE SEARCH RESULT");
     return model.chat(coreMessages, { signal: controller.signal, onResultChange })
   }
 
@@ -61,7 +62,8 @@ async function handleSearchResult(
     result.type === 'knowledge_base' || toolName === 'query_knowledge_base'
       ? constructMessagesWithKnowledgeBaseResults(messages, result.searchResults)
       : constructMessagesWithSearchResults(messages, result.searchResults)
-
+  
+  console.log("HANDLE SEARCH RESULT");
   const response = model.chat(await convertToCoreMessages(messagesWithResults), {
     signal: controller.signal,
     onResultChange: (data) => {

@@ -15,7 +15,7 @@ export const useAgentProviders = () => {
 
   const agentProviders = useMemo(
     () => allAgentCards.map((p) => {
-      if (!isEmpty(p.chatboxSettingId)) {
+      if (isEmpty(p.chatboxSettingId)) {
         return null;
       }
       const agentCardSetting = agentProviderSettings?.[p.chatboxSettingId || ""];
