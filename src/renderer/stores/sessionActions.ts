@@ -308,7 +308,8 @@ export function refreshContextAndCreateNewThread(sessionId: string) {
   saveSession({
     ...session,
     threads: session.threads ? [...session.threads, newThread] : [newThread],
-    messages: systemPrompt ? [systemPrompt] : [createMessage('system', defaults.getDefaultPrompt())],
+    // messages: systemPrompt ? [systemPrompt] : [createMessage('system', defaults.getDefaultPrompt())],
+    messages: systemPrompt ? [systemPrompt] : [],
     threadName: '',
     messageForksHash: undefined,
   })
@@ -1216,9 +1217,9 @@ export function initEmptyChatSession(): Omit<Session, 'id'> {
         : chatSessionSettings),
     },
   }
-  if (settings.defaultPrompt) {
-    newSession.messages.push(createMessage('system', settings.defaultPrompt || defaults.getDefaultPrompt()))
-  }
+  // if (settings.defaultPrompt) {
+  //   newSession.messages.push(createMessage('system', settings.defaultPrompt || defaults.getDefaultPrompt()))
+  // }
   return newSession
 }
 

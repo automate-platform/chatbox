@@ -1,5 +1,5 @@
 import { CoreMessage } from "ai";
-import { StreamTextResult } from "../types";
+import { MessageContentParts, StreamTextResult } from "../types";
 import { Transformer, TransformerOptions } from "../types/transformer";
 import {
   A2ARequest,
@@ -9,8 +9,12 @@ import {
   Part,
   TextPart,
   MessageSendParams,
-  JSONRPCResponse
-} from "../types/a2a-protocol";
+  JSONRPCResponse,
+  FilePart,
+  DataPart,
+  Message1,
+  Message2
+} from "@a2a-js/sdk";
 import { isEmpty } from "lodash";
 
 
@@ -155,16 +159,16 @@ export class A2ATransformer implements Transformer {
   }
 
 
+  //TODO HANDLE FILEPART /DATA PART
   async transformResponseIn(
     response: JSONRPCResponse,
     options: TransformerOptions = {}
   ): Promise<StreamTextResult> {
     try {
+      //TODO: CHECK TYPE: TASK, MESSAGE
+      //TODO: IF ARTIFACT - CHECK PART - TEXT - FILE - DATA PART
       const textContent = this.extractTextFromA2AResponse(response);
-
-
       // TODO: ADD NODE_RED HOOK
-
       const streamResult: StreamTextResult = {
         contentParts: [{ type: `text`, text: `${textContent}` }],
         usage: {
@@ -180,7 +184,6 @@ export class A2ATransformer implements Transformer {
       throw new Error(`Failed to transform A2A response to StreamTextResult: ${error.message}`);
     }
   }
-
   /**
    * Extract text content from A2A JSON-RPC response
    */
@@ -201,23 +204,39 @@ export class A2ATransformer implements Transformer {
       if (typeof result === 'object' && result && 'kind' in result && result.kind === 'task') {
         const task = result as any;
         let responseText = "";
+        // according to specification, artifact != message, so the history may not include message
         if (task.artifacts) {
           const lastArtiffacts = task.artifacts[task.artifacts.length - 1];
-            if (lastArtiffacts && lastArtiffacts.parts) {
-              responseText = lastArtiffacts.parts
-                .filter((part: Part): part is TextPart => part.kind === 'text')
-                .map((part: TextPart) => part.text)
-                .join('\n');
-            }
+          if (lastArtiffacts && lastArtiffacts.parts) {
+            // instead of filter out kind === text -> need the handle other cases like file or data as well
+            responseText = lastArtiffacts.parts
+              .filter((part: Part): part is TextPart => part.kind === 'text')
+              .map((part: TextPart) => part.text)
+              .join('\n');
+          }
         }
         if (!isEmpty(responseText)) {
+          console.log("RETURN RESULT FROM ARTIFACTS")
           return responseText;
-        } 
+        }
+        if (task.status && task.status.message) {
+          const message: Message | Message1 | Message2 = task.status.message;
+          const parts = message.parts;
+          if (parts && Array.isArray(parts)) {
+            responseText = parts.filter((part: Part): part is TextPart => part.kind === 'text').map((part: TextPart) => part.text).join('\n');
+          }
+        }
+        if (!isEmpty(responseText)) {
+          console.log("RETURN RESULT FROM STATUS");
+          return responseText;
+        }
         if (task.history && Array.isArray(task.history)) {
           console.log("GET MESSAGE FROM TASK HISTORY");
-          const lastMessage = task.history[task.history.length - 1];
+          const agentMessageHistory = task.history.filter((item: Message1 | Message2) => item.role !== 'user');
+          const lastMessage = agentMessageHistory[agentMessageHistory.length - 1] || null;
           console.log("LAST MESSAGE FROM TASK HISTORY", lastMessage);
           if (lastMessage && lastMessage.parts) {
+            console.log("RETURN RESULT FROM HISTORY")
             return lastMessage.parts
               .filter((part: Part): part is TextPart => part.kind === 'text')
               .map((part: TextPart) => part.text)
@@ -225,12 +244,13 @@ export class A2ATransformer implements Transformer {
           }
         }
       }
-
       if (typeof result === 'string') {
+        console.log("RETURN RESULT AS STRING")
         return result;
       }
 
       if (typeof result === 'object' && result) {
+        console.log("RETURN RESULT")
         return JSON.stringify(result, null, 2);
       }
     }

@@ -1,6 +1,6 @@
 import { CoreMessage } from "ai";
 import { StreamTextResult } from "../types";
-import { A2ARequest, JSONRPCResponse } from "./a2a-protocol";
+import { A2ARequest, JSONRPCResponse } from "@a2a-js/sdk";
 
 export type TransformerOptions = Record<string, any>;
 
