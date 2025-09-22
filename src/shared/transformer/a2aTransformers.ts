@@ -11,6 +11,7 @@ import {
   MessageSendParams,
   JSONRPCResponse
 } from "../types/a2a-protocol";
+import { isEmpty } from "lodash";
 
 
 //TODO:
@@ -199,21 +200,25 @@ export class A2ATransformer implements Transformer {
 
       if (typeof result === 'object' && result && 'kind' in result && result.kind === 'task') {
         const task = result as any;
+        let responseText = "";
+        if (task.artifacts) {
+          const lastArtiffacts = task.artifacts[task.artifacts.length - 1];
+            if (lastArtiffacts && lastArtiffacts.parts) {
+              responseText = lastArtiffacts.parts
+                .filter((part: Part): part is TextPart => part.kind === 'text')
+                .map((part: TextPart) => part.text)
+                .join('\n');
+            }
+        }
+        if (!isEmpty(responseText)) {
+          return responseText;
+        } 
         if (task.history && Array.isArray(task.history)) {
           console.log("GET MESSAGE FROM TASK HISTORY");
           const lastMessage = task.history[task.history.length - 1];
           console.log("LAST MESSAGE FROM TASK HISTORY", lastMessage);
           if (lastMessage && lastMessage.parts) {
             return lastMessage.parts
-              .filter((part: Part): part is TextPart => part.kind === 'text')
-              .map((part: TextPart) => part.text)
-              .join('\n');
-          }
-        }
-        if (task.artifacts) {
-          const lastArtiffacts = task.artifacts[task.artifacts.length - 1];
-          if (lastArtiffacts && lastArtiffacts.parts) {
-            return lastArtiffacts.parts
               .filter((part: Part): part is TextPart => part.kind === 'text')
               .map((part: TextPart) => part.text)
               .join('\n');
