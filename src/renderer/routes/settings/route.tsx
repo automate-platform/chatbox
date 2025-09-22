@@ -23,6 +23,11 @@ import { featureFlags } from '@/utils/feature-flags'
 
 const ITEMS = [
   {
+    key: 'agent_provider',
+    label: 'Agent Providers',
+    icon: <IconAdjustmentsHorizontal className="w-full h-full" />,
+  },
+  {
     key: 'provider',
     label: 'Model Provider',
     icon: <IconCategory className="w-full h-full" />,
@@ -69,11 +74,6 @@ const ITEMS = [
         icon: <IconKeyboard className="w-full h-full" />,
       },
     ]),
-  {
-    key: 'agent_provider',
-    label: 'Agent Providers Setting',
-    icon: <IconAdjustmentsHorizontal className="w-full h-full" />,
-  },
   {
     key: 'general',
     label: 'General Settings',

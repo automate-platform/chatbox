@@ -1,5 +1,5 @@
 import { AgentCard } from "../types";
-import { A2ARequest, JSONRPCResponse } from "../types/a2a-protocol";
+import { A2ARequest, JSONRPCResponse } from "@a2a-js/sdk";
 
 export interface A2AClientInterface {
     sendA2AMessageSingle: (a2aRequest: A2ARequest, baseAgentUrl: string) => Promise<JSONRPCResponse>

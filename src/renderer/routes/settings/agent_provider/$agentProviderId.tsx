@@ -7,6 +7,8 @@ import { getModelSettingUtil } from '@/packages/model-setting-utils'
 import platform from '@/platform'
 import { add as addToast } from '@/stores/toastActions'
 import NiceModal from '@ebay/nice-modal-react'
+import JSONPretty from 'react-json-pretty';
+import JSONPrettyMon from 'react-json-pretty/themes/monikai.css'
 import {
   Button,
   Flex,
@@ -199,9 +201,7 @@ function AgentProviderSettings({ agentProviderId }: { agentProviderId: string })
           }
           {
             !isEmpty(currentAgentCard) && !isError && (
-              <Text span c="chatbox-success">
-                {JSON.stringify(currentAgentCard)}
-              </Text>
+              <JSONPretty data={currentAgentCard} theme={JSONPrettyMon}></JSONPretty>
             )
           }
         </Stack>
