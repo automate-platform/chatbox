@@ -71,7 +71,7 @@ extraResources:
   - ./assets/**
   - from: ./public
     to: public
-  - from: ./src/main/node-red
+  - from: ./src/node-red
     to: node-red
 publish:
   - provider: s3
