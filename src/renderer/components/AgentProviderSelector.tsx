@@ -236,7 +236,7 @@ const AgentProviderItem = ({
           className="flex-shrink"
           c={'chatbox-primary'}
         >
-          {agentCard.name}
+          {agentCard.chatboxAgentName || agentCard.name}
         </Text>
       </Combobox.Option>
     </>
@@ -267,7 +267,7 @@ const AgentProviderItemInDrawer = ({
     >
       {/* TODO: ADD ICON */}
       <Text span size="md" className="flex-grow-0 flex-shrink text-left overflow-hidden break-words !text-inherit">
-        {agentCard.name}
+        {agentCard.chatboxAgentName || agentCard.name}
       </Text>
       <Flex
         component="span"

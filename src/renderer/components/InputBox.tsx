@@ -170,7 +170,7 @@ const InputBox = forwardRef<InputBoxRef, InputBoxProps>(
       if (!agentCard) {
         return t('Select Agent')
       }
-      return `${agentCard?.name}`
+      return `${agentCard?.chatboxAgentName || agentCard?.name}`
     }, [agentProviders, agent, t])
 
     const [showSelectModelErrorTip, setShowSelectModelErrorTip] = useState(false)

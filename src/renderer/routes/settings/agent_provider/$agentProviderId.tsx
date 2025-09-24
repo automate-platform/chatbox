@@ -100,8 +100,8 @@ function AgentProviderSettings({ agentProviderId }: { agentProviderId: string })
       const agentCard = await a2aClient.getAgentCard(currentUrl);
       agentCard.chatboxSettingId = agentProviderId;
       agentCard.baseUrl = currentUrl;
-      setBaseInfo(agentCard);
-      setAgentCardInfo(agentCard);
+      setBaseInfo((old) => ({...old,...agentCard}));
+      setAgentCardInfo((old:any) => ({...old,...agentCard}));
       setAgentProviderSettings({
         agentUrl: currentUrl,
       })

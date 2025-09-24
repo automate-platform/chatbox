@@ -32,7 +32,7 @@ export class A2AClient implements A2AClientInterface {
         try {
             // Construct the well-known endpoint URL
             const url = new URL(baseAgentUrl);
-            url.pathname = '/.well-known/agent.json';
+            url.pathname = '/.well-known/agent-card.json';
 
             const response = await fetch(url.toString(), {
                 method: 'GET',

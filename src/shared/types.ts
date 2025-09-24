@@ -467,8 +467,9 @@ export type AgentCard = Partial <{
   /**
    * A unique identifier for the agent in the storage.
    */
-  chatboxSettingId: string,
+  chatboxSettingId: string;
 
+  chatboxAgentName: string;
   /**
    * The human-readable name of the agent (e.g., "Recipe Bot").
    */

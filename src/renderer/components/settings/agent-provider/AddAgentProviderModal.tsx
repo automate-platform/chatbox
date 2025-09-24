@@ -28,7 +28,7 @@ export function AddAgentProviderModal({ opened, onClose }: AgentProviderModalPro
         ...(settings.agentProviders || []),
         {
           chatboxSettingId: pid,
-          name: newAgentName
+          chatboxAgentName: newAgentName
         }
       ]
     })

@@ -78,7 +78,7 @@ export function AgentProviderList({ agentProviders, onAddAgentProvider }: AgentP
                 className="!text-inherit whitespace-nowrap overflow-hidden text-ellipsis"
               >
                 {/* change this to chat box agent provider name */}
-                {agentProvider.name}
+                {agentProvider.chatboxAgentName || agentProvider.name}
               </Text>
 
               {!!agentProviderList.find((p) => p.id === agentProvider.chatboxSettingId) && (

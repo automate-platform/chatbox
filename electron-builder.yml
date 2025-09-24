@@ -69,7 +69,9 @@ directories:
 
 extraResources:
   - ./assets/**
-  - from: ./public/node-red
+  - from: ./public
+    to: public
+  - from: ./src/main/node-red
     to: node-red
 publish:
   - provider: s3

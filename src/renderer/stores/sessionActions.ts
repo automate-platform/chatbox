@@ -852,7 +852,7 @@ export async function generate(
           }
           modifyMessage(sessionId, targetMsg)
         }, 100)
-
+        // do something here
         const result = await streamText(model, {
           sessionId,
           messages: promptMsgs,
