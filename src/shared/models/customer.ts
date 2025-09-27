@@ -11,6 +11,9 @@ import { createA2ATransformer } from '../transformer/a2aTransformers'
 import { A2AClient, A2AClientInterface } from '../utils/a2a_util'
 import { getCurrentSessionMergedSettings } from '@/stores/sessionActions'
 import { isEmpty } from 'lodash'
+import { Platform } from '@/platform/interfaces'
+import platform from '@/platform'
+import DesktopPlatform from '@/platform/desktop_platform'
 
 interface Options {
     apiKey: string
@@ -29,6 +32,7 @@ export default class Custom extends AbstractAISDKModel {
     public name = 'Custom'
     public options: Options
     public a2aClient: A2AClientInterface = new A2AClient();
+    public platform: Platform = platform;
     public transformer = createA2ATransformer();
     private settings = getCurrentSessionMergedSettings();
     private selectedAgent: AgentCard | null = null;
@@ -38,6 +42,7 @@ export default class Custom extends AbstractAISDKModel {
         this.options = { ...options, apiHost }
         const agentProviders = this.settings.agentProviders;
         console.log("MODEL GENERATED",this.settings);
+        console.log(platform instanceof DesktopPlatform, platform.triggerNode)
         this.selectedAgent = agentProviders?.find(item => item.chatboxSettingId === this.settings.agentProviderId && !isEmpty(item.chatboxSettingId)) || null;
     }
 
@@ -156,10 +161,13 @@ export default class Custom extends AbstractAISDKModel {
     ): Promise<Response> {
         try {
             // Transform messages to A2A format using the transformer
+
+            const a2aOptions:any = {...options};
             const transformedRequest = await this.transformer.transformRequestOut(messages, {
                 streaming: this.options.stream || false,
-                ...options
+                ...a2aOptions
             });
+
 
             // Prepare headers
             const headers: Record<string, string> = {
@@ -225,10 +233,25 @@ export default class Custom extends AbstractAISDKModel {
     ): Promise<StreamTextResult> {
         try {
             //TODO: ADD APP ID
+            let nodeRedResult = null;
+            if (platform instanceof DesktopPlatform && this.platform.triggerNode) {
+                console.log("TRIGGERED");
+                nodeRedResult = await this.platform.triggerNode("test-flow");
+                console.log("NODERED SUCCESS", nodeRedResult);
+            }
+            else {
+                console.log("unable to triggerd node-red", platform instanceof DesktopPlatform, this.platform.triggerNode);
+            }
+            console.log("NODERD", nodeRedResult)
+            const a2aOptions = {...options};
+            if (nodeRedResult) {
+                //@ts-ignore
+                a2aOptions.messageMetadata = nodeRedResult;
+            }
             const transformedRequest = await this.transformer.transformRequestOut(coreMessages, {
                 streaming: this.options.stream || false,
                 contextId: options.sessionId,
-                ...options
+                ...a2aOptions
             });
             if (!this.selectedAgent || !this.selectedAgent.baseUrl) {
                 console.log(this.a2aClient, this.selectedAgent?.baseUrl);
@@ -240,6 +263,7 @@ export default class Custom extends AbstractAISDKModel {
             return convertedResult
         } catch (error) {
             // Handle errors consistently with streaming mode
+            console.log(error);
             this.handleErrorCustom(error)
         }
     }

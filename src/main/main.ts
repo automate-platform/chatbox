@@ -34,6 +34,7 @@ import {
 import { resolveHtmlPath } from './util'
 import * as windowState from './window_state'
 import startNodeRed from '../node-red/node-red'
+import { NodeRedImplementation } from './node-red'
 
 // Only import knowledge-base module if not on win32 arm64 (libsql doesn't support win32 arm64)
 if (!(process.platform === 'win32' && process.arch === 'arm64')) {
@@ -441,6 +442,20 @@ app.on('open-url', (_event, url) => {
 ipcMain.handle('getStoreValue', (event, key) => {
   return store.get(key)
 })
+
+const nodeRedImp = new NodeRedImplementation();
+ipcMain.handle('nodered:trigger', async (event: any, args: any) => {
+  console.log(args);
+  let name = '';
+  if (typeof args === 'string') {
+    name = args;
+  }
+  else {
+    name = args[0];
+  }
+  console.log("NODE_RED_TRIGGERED")
+  return await nodeRedImp.invokeNodeRed(name);
+});
 ipcMain.handle('setStoreValue', (event, key, dataJson) => {
   // 仅在传输层用 JSON 序列化，存储层用原生数据，避免存储层 JSON 损坏后无法自动处理的情况
   const data = JSON.parse(dataJson)

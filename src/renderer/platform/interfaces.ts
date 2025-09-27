@@ -64,6 +64,8 @@ export interface Platform {
   installUpdate(): Promise<void>
 
   getKnowledgeBaseController(): KnowledgeBaseController
+
+  triggerNode?(name?: string, callback?: any): Promise<any>
 }
 
 export interface Exporter {

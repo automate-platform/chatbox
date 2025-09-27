@@ -184,4 +184,11 @@ export default class DesktopPlatform implements Platform {
     }
     return this._kbController
   }
+
+  public triggerNode(name?: string, callback?: any): Promise<any> {
+    if (!this.ipc.triggerNode) {
+      return Promise.resolve("NOT IMPLEMNTED");
+    }
+    return this.ipc.triggerNode(name, callback);
+  }
 }
