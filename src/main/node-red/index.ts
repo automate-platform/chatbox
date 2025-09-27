@@ -1,4 +1,4 @@
-import helper from "node-red-node-test-helper";
+// import helper from "node-red-node-test-helper";
 import path from "path";
 import fs from 'fs/promises';
 import { LocalSettings } from "@node-red/runtime";
@@ -16,7 +16,7 @@ export type FlowNode = {
 const getSettings = require("../../node-red/config").getSettings;
 console.log("PRECHECK: ", getSettings, require('node-red'))
 export class NodeRedImplementation implements NodeRedInterface {
-    private helper = helper;
+    private helper = new (require("../../node-red/node-red-node-helper")).NodeTestHelper('node-red');
     private initialised = false;
     private nodeHashMap: Map<string, FlowNode> = new Map<string, FlowNode>();
     public async invokeNodeRed(name?: string, callback?: any): Promise<any> {
@@ -68,7 +68,7 @@ export class NodeRedImplementation implements NodeRedInterface {
                     }
                     return new Promise((resolve, reject) => {
                         //TODO: HANDLE TIMEOUT
-                        realNode.on("input", (msg) => {
+                        realNode.on("input", (msg:any) => {
                             resolve(msg);
                         })
                     })
@@ -111,7 +111,7 @@ export class NodeRedImplementation implements NodeRedInterface {
             uiHost: settings.uiHost,
             flowFile: settings.flowFile
         }
-        helper.init(require.resolve("node-red"), localSettings);
+        this.helper.init(require.resolve("node-red"), localSettings);
         this.initialised = true;
         const flowNodes = await this.readFlowFile(settings);
         console.log("FLOW NODES", flowNodes);
