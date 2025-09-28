@@ -214,7 +214,7 @@ if (process.env.NODE_ENV === 'production') {
 
 const isDebug = process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
 
-if (isDebug) {
+if (true) {
   require('electron-debug')()
 }
 
@@ -392,6 +392,7 @@ if (!gotTheLock) {
       ensureTray()
       // Remove this if your app does not use auto updates
       // eslint-disable-next-line
+      mainWindow?.webContents.openDevTools();
       app.on('activate', () => {
         // On macOS it's common to re-create a window in the app when the
         // dock icon is clicked and there are no other windows open.
