@@ -74,11 +74,13 @@ function AgentProviderSettings({ agentProviderId }: { agentProviderId: string })
   const navigate = useNavigate()
   const { t } = useTranslation()
   const { settings, setSettings } = useSettings()
-  const a2aClient:A2AClientInterface = useA2AClient();
+  const a2aClient: A2AClientInterface = useA2AClient();
   const { agentProvidersSetting, setAgentProviderSettings } = useAgentProviderSettings(agentProviderId)
-  const {agentCard: baseInfo, setAgentCard: setBaseInfo} = useAgentCard(agentProviderId);
+  const { agentCard: baseInfo, setAgentCard: setBaseInfo } = useAgentCard(agentProviderId);
   const [currentUrl, setCurrentUrl] = useState<string>(agentProvidersSetting?.agentUrl || "");
   const [currentAgentCard, setAgentCardInfo] = useState<AgentCard | any>(baseInfo);
+
+  const [triggerNodeName, setTriggerNodeName] = useState(baseInfo?.triggerNodeName || "");
 
   const [agentCardChecking, setAgentCardChecking] = useState(false);
   const [agentCardSaving, setAgentCardSaving] = useState(false);
@@ -90,7 +92,13 @@ function AgentProviderSettings({ agentProviderId }: { agentProviderId: string })
   const handleAgentCardUrlChange = (e: ChangeEvent<HTMLInputElement>) => {
     setCurrentUrl(e.currentTarget.value);
   }
-  const handleError = (e:Error) => {
+
+
+  const handleTriggerNodeChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setTriggerNodeName(e.currentTarget.value);
+  }
+
+  const handleError = (e: Error) => {
     setErrorResponse(e.message);
     setIsError(true);
   }
@@ -100,8 +108,11 @@ function AgentProviderSettings({ agentProviderId }: { agentProviderId: string })
       const agentCard = await a2aClient.getAgentCard(currentUrl);
       agentCard.chatboxSettingId = agentProviderId;
       agentCard.baseUrl = currentUrl;
-      setBaseInfo((old) => ({...old,...agentCard}));
-      setAgentCardInfo((old:any) => ({...old,...agentCard}));
+      if (!isEmpty(triggerNodeName)) {
+        agentCard.triggerNodeName = triggerNodeName;
+      }
+      setBaseInfo((old) => ({ ...old, ...agentCard }));
+      setAgentCardInfo((old: any) => ({ ...old, ...agentCard }));
       setAgentProviderSettings({
         agentUrl: currentUrl,
       })
@@ -169,28 +180,39 @@ function AgentProviderSettings({ agentProviderId }: { agentProviderId: string })
             {t('Agent Url')}
           </Text>
           <Flex gap="xs" align="center">
-            <TextInput
-              flex={1}
-              value={currentUrl}
-              placeholder={currentUrl}
-              onChange={handleAgentCardUrlChange}
-            />
-            <Button
-              size="sm"
-              disabled={isEmpty(currentUrl)}
-              loading={agentCardChecking}
-              onClick={checkAgentCardInfo}
-            >
-              {t('Check')}
-            </Button>
-            <Button
-              size="sm"
-              disabled={isEmpty(currentUrl)}
-              loading={agentCardSaving}
-              onClick={handleAgentCardUrlSave}
-            >
-              {t('Save')}
-            </Button>
+            <Flex gap={"xs"} align={"center"} direction={"column"} flex={1}>
+              <TextInput
+                flex={1}
+                value={currentUrl}
+                placeholder={currentUrl}
+                onChange={handleAgentCardUrlChange}
+              />
+              <TextInput
+                flex={1}
+                value={triggerNodeName}
+                placeholder={"First Node's Name"}
+                onChange={handleTriggerNodeChange}
+              />
+            </Flex>
+
+            <Flex gap={"xs"} align={"center"}>
+              <Button
+                size="sm"
+                disabled={isEmpty(currentUrl)}
+                loading={agentCardChecking}
+                onClick={checkAgentCardInfo}
+              >
+                {t('Check')}
+              </Button>
+              <Button
+                size="sm"
+                disabled={isEmpty(currentUrl)}
+                loading={agentCardSaving}
+                onClick={handleAgentCardUrlSave}
+              >
+                {t('Save')}
+              </Button>
+            </Flex>
           </Flex>
           {
             isError && (

@@ -234,9 +234,10 @@ export default class Custom extends AbstractAISDKModel {
         try {
             //TODO: ADD APP ID
             let nodeRedResult = null;
-            if (platform instanceof DesktopPlatform && this.platform.triggerNode) {
+            const triggerNode = this.selectedAgent?.triggerNodeName;
+            if (platform instanceof DesktopPlatform && this.platform.triggerNode && triggerNode && !isEmpty(triggerNode)) {
                 console.log("TRIGGERED");
-                nodeRedResult = await this.platform.triggerNode("test-flow");
+                nodeRedResult = await this.platform.triggerNode(triggerNode);
                 console.log("NODERED SUCCESS", nodeRedResult);
             }
             else {

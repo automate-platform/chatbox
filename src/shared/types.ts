@@ -512,6 +512,7 @@ export type AgentCard = Partial <{
    * Timestamp of when the Agent Card was last updated.
    */
   lastUpdated?: string;
+  triggerNodeName?: string;
 }>
 export interface ShortcutSetting {
   // windowQuickToggle: string // 快速切换窗口显隐的快捷键
