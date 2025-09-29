@@ -180,15 +180,17 @@ function AgentProviderSettings({ agentProviderId }: { agentProviderId: string })
             {t('Agent Url')}
           </Text>
           <Flex gap="xs" align="center">
-            <Flex gap={"xs"} align={"center"} direction={"column"} flex={1}>
+            <Flex gap={"xs"} align={"center"} direction={"column"} flex={1} style={{width: "100%"}}>
               <TextInput
                 flex={1}
                 value={currentUrl}
+                style={{width: "100%"}}
                 placeholder={currentUrl}
                 onChange={handleAgentCardUrlChange}
               />
               <TextInput
                 flex={1}
+                style={{width: "100%"}}
                 value={triggerNodeName}
                 placeholder={"First Node's Name"}
                 onChange={handleTriggerNodeChange}
