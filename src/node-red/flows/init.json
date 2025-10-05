@@ -11,7 +11,7 @@
         "id": "ad767efb81ba69c0",
         "type": "inject",
         "z": "ec288c38e877de1a",
-        "name": "",
+        "name": "none",
         "props": [
             {
                 "p": "payload"
@@ -28,7 +28,7 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 300,
+        "x": 290,
         "y": 160,
         "wires": [
             [
@@ -106,7 +106,7 @@
         "type": "function",
         "z": "ec288c38e877de1a",
         "name": "function 2",
-        "func": "msg.payload = \"SOME MEANINGFULL DATA\";\nreturn msg;",
+        "func": "msg.payload = \"SOME MEANINGFULL DATA\";\nnode.warn(msg);\n\nmsg.callbackSuccess({\n    message: \"YAYAYAYYAY\"\n})\n// msg.handleCallback() // data\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -117,7 +117,7 @@
         "y": 340,
         "wires": [
             [
-                "aed326a2382aa0a7"
+                "0eb4f7a82c7844d0"
             ]
         ]
     },
@@ -133,8 +133,28 @@
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 640,
+        "x": 820,
         "y": 340,
         "wires": []
+    },
+    {
+        "id": "0eb4f7a82c7844d0",
+        "type": "function",
+        "z": "ec288c38e877de1a",
+        "name": "function 3",
+        "func": "\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 660,
+        "y": 340,
+        "wires": [
+            [
+                "aed326a2382aa0a7"
+            ]
+        ]
     }
 ]

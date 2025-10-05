@@ -224,7 +224,10 @@ export default class Custom extends AbstractAISDKModel {
 
         // return this.handleStreamingCompletion(model, coreMessages, options, callSettings)
     }
-
+    // chatbox -> chat box messaege -> node red -> transformer -> final  call callback -> result (chat box message format) 
+    // choose agent -> logic agent bypass model provider
+    // workspace -> choose workspace settings
+    // choose workspace path -> path save -> open workspace -> open the path
     private async handleNonStreamingCompletionCustom<T extends ToolSet>(
         model: any, // Using 'any' for LanguageModelV1
         coreMessages: CoreMessage[],
@@ -237,6 +240,7 @@ export default class Custom extends AbstractAISDKModel {
             const triggerNode = this.selectedAgent?.triggerNodeName;
             if (platform instanceof DesktopPlatform && this.platform.triggerNode && triggerNode && !isEmpty(triggerNode)) {
                 console.log("TRIGGERED");
+                // callback defined here
                 nodeRedResult = await this.platform.triggerNode(triggerNode);
                 console.log("NODERED SUCCESS", nodeRedResult);
             }

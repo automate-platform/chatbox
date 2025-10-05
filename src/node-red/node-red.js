@@ -58,6 +58,9 @@ async function startNodeRed() {
 
   return RED;
 }
-
+function getNodeRed() {
+  return RED
+}
 module.exports = startNodeRed;
+module.exports.getNodeRed = getNodeRed;
  
