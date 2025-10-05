@@ -446,16 +446,17 @@ ipcMain.handle('getStoreValue', (event, key) => {
 
 const nodeRedImp = new NodeRedImplementation();
 ipcMain.handle('nodered:trigger', async (event: any, args: any) => {
-  console.log(args);
   let name = '';
+  let payload: any = null;
   if (typeof args === 'string') {
     name = args;
   }
   else {
     name = args[0];
+    payload = args[1];
   }
-  console.log("NODE_RED_TRIGGERED")
-  return await nodeRedImp.invokeNodeRed(name);
+  console.log("NODE_RED_TRIGGERED", payload)
+  return await nodeRedImp.invokeNodeRed(name, payload || undefined);
 });
 ipcMain.handle('setStoreValue', (event, key, dataJson) => {
   // 仅在传输层用 JSON 序列化，存储层用原生数据，避免存储层 JSON 损坏后无法自动处理的情况

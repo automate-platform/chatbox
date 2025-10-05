@@ -5,5 +5,5 @@ export interface ElectronIPC {
   onUpdateDownloaded: (callback: () => void) => () => void
   addMcpStdioTransportEventListener: (transportId: string, event: string, callback?: (...args: any[]) => void) => void
   onNavigate: (callback: (path: string) => void) => () => void;
-  triggerNode?: (name?: string, callback?: any) => Promise<any>;
+  triggerNode?: (name?: string, payload?: any) => Promise<any>;
 }

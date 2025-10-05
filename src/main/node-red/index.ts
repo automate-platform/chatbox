@@ -1,7 +1,7 @@
 // import helper from "node-red-node-test-helper";
 import path, { resolve } from "path";
 import fs from 'fs/promises';
-import { isEmpty, result } from "lodash";
+import { isEmpty, result, cloneDeep } from "lodash";
 export interface NodeRedInterface {
     invokeNodeRed?: (name?: string, callback?: any) => Promise<any>;
 }
@@ -38,12 +38,12 @@ const { getNodeRed } = require("../../node-red/node-red");
 export class NodeRedImplementation implements NodeRedInterface {
     private nodes = require("@node-red/runtime/lib/nodes");
     private _RED_ = getNodeRed();
-    public async invokeNodeRed(name?: string, callback?: any): Promise<any> {
+    public async invokeNodeRed(name?: string, payload?: any): Promise<any> {
         try {
             log.warn("Invoke node red");
-            if (typeof callback === 'function') {
-                callback(`Invoked Node-RED with name: ${name}`);
-            }
+            // if (typeof callback === 'function') {
+            //     callback(`Invoked Node-RED with name: ${name}`);
+            // }
             const nodeDef = await this.getNodeByName(name);
             if (!nodeDef) {
                 log.warn("NODE DEF IS NULL", name);
@@ -56,9 +56,7 @@ export class NodeRedImplementation implements NodeRedInterface {
                 const msg = {
                     callbackSuccess: (payload: any) => resolve(payload),
                     callbackError: (payload: any) => reject(payload),
-                    payload: {
-                        // TODO: add input fields if necessary
-                    }
+                    chatboxPayload: cloneDeep(payload)
                 };
 
                 try {

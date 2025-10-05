@@ -65,7 +65,7 @@ export interface Platform {
 
   getKnowledgeBaseController(): KnowledgeBaseController
 
-  triggerNode?(name?: string, callback?: any): Promise<any>
+  triggerNode?(name?: string, payload?: any): Promise<any>
 }
 
 export interface Exporter {

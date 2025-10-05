@@ -50,10 +50,10 @@ const electronHandler: ElectronIPC = {
     ipcRenderer.on('navigate-to', listener)
     return () => ipcRenderer.off('navigate-to', listener)
   },
-  triggerNode: async (name?:string, callback?: any) => 
+  triggerNode: async (name?:string, payload?: any) => 
   {
-    console.log("electron handler triggered node-red");
-    return ipcRenderer.invoke('nodered:trigger', name)
+    console.log("electron handler triggered node-red", name, payload);
+    return ipcRenderer.invoke('nodered:trigger', [name, payload])
   }
 }
 

@@ -142,87 +142,11 @@ export default class Custom extends AbstractAISDKModel {
             throw e
         }
     }
-    /**
-     * Send a POST request to an LLM provider endpoint
-     * @param endpoint - The LLM provider endpoint URL
-     * @param messages - Array of CoreMessage objects to send
-     * @param options - Additional request options
-     * @returns Promise<Response> - The response from the LLM provider
-     */
-    public async sendLLMRequest(
-        endpoint: string,
-        messages: CoreMessage[],
-        options: {
-            apiKey?: string;
-            headers?: Record<string, string>;
-            timeout?: number;
-            useProxy?: boolean;
-        } = {}
-    ): Promise<Response> {
-        try {
-            // Transform messages to A2A format using the transformer
-
-            const a2aOptions:any = {...options};
-            const transformedRequest = await this.transformer.transformRequestOut(messages, {
-                streaming: this.options.stream || false,
-                ...a2aOptions
-            });
-
-
-            // Prepare headers
-            const headers: Record<string, string> = {
-                'Content-Type': 'application/json',
-                ...options.headers
-            };
-
-            // Add API key if provided
-            if (options.apiKey) {
-                headers['Authorization'] = `Bearer ${options.apiKey}`;
-            }
-
-            // Create fetch function with or without proxy
-            const fetchFn = createFetchWithProxy(
-                options.useProxy ?? this.options.useProxy,
-                this.dependencies
-            );
-
-            // Create abort controller for timeout
-            const controller = new AbortController();
-            if (options.timeout) {
-                setTimeout(() => controller.abort(), options.timeout);
-            }
-
-            // Send the POST request
-            const response = await fetchFn(endpoint, {
-                method: 'POST',
-                headers,
-                body: JSON.stringify(transformedRequest),
-                signal: controller.signal
-            });
-
-            if (!response.ok) {
-                throw new ApiError(
-                    `HTTP ${response.status}: ${response.statusText}`,
-                    await response.text()
-                );
-            }
-
-            return response;
-
-        } catch (error) {
-            this.handleErrorCustom(error, ` when sending request to ${endpoint}`);
-        }
-    }
     private async _callChatCompletionCustom<T extends ToolSet>(
         coreMessages: CoreMessage[],
         options: CallChatCompletionOptions<T>
     ): Promise<StreamTextResult> {
         return this.handleNonStreamingCompletionCustom(null, coreMessages, options, {})
-        // if (this.options.stream === false) {
-        //   return this.handleNonStreamingCompletionCustom(model, coreMessages, options, callSettings)
-        // }
-
-        // return this.handleStreamingCompletion(model, coreMessages, options, callSettings)
     }
     // chatbox -> chat box messaege -> node red -> transformer -> final  call callback -> result (chat box message format) 
     // choose agent -> logic agent bypass model provider
@@ -241,11 +165,18 @@ export default class Custom extends AbstractAISDKModel {
             if (platform instanceof DesktopPlatform && this.platform.triggerNode && triggerNode && !isEmpty(triggerNode)) {
                 console.log("TRIGGERED");
                 // callback defined here
-                nodeRedResult = await this.platform.triggerNode(triggerNode);
+                nodeRedResult = await this.platform.triggerNode(triggerNode, {
+                    coreMessages: {...coreMessages},
+                    options: {
+                        sessionId: options.sessionId,
+                        // ADD HERE
+                    }
+                });
                 console.log("NODERED SUCCESS", nodeRedResult);
             }
             else {
-                console.log("unable to triggerd node-red", platform instanceof DesktopPlatform, this.platform.triggerNode);
+                //DO SOMETHING ABOUT THIS? -> GO BACK TO MODEL MODE @@
+                throw new Error("UNABLE TO TRIGGER NODERED")
             }
             console.log("NODERD", nodeRedResult)
             const a2aOptions = {...options};
