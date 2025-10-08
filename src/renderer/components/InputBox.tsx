@@ -141,7 +141,7 @@ const InputBox = forwardRef<InputBoxRef, InputBoxProps>(
     )
     const [webBrowsingMode, setWebBrowsingMode] = useAtom(atoms.inputBoxWebBrowsingModeAtom)
 
-    const {settings, setSettings} = useSettings();
+    const { settings, setSettings } = useSettings();
 
     const [links, setLinks] = useAtom(atoms.inputBoxLinksAtom)
 
@@ -638,7 +638,7 @@ const InputBox = forwardRef<InputBoxRef, InputBoxProps>(
                     }
                     withArrow
                     position="top">
-                       <ActionIcon
+                    <ActionIcon
                       size="24px"
                       variant="subtle"
                       color={settings.agentMode ? 'chatbox-brand' : 'chatbox-secondary'}
@@ -768,62 +768,70 @@ const InputBox = forwardRef<InputBoxRef, InputBoxProps>(
             </Flex>
 
             <Flex gap={isSmallScreen ? 'xxs' : 'sm'} align="flex-end" justify="flex-end">
-              <Tooltip
-                label={t('Please select a model')}
-                color="chatbox-error"
-                opened={showSelectModelErrorTip}
-                withArrow
-              >
-                {sessionType === 'picture' ? (
-                  <ImageModelSelect onSelect={onSelectModel}>
-                    <span className="flex items-center text-sm opacity-70 cursor-pointer bg-transparent hover:bg-slate-400/25 h-6">
-                      {providers.find((p) => p.id === model?.provider)?.name || model?.provider || t('Select Model')}
-                      <IconSelector size={16} className="opacity-50" />
-                    </span>
-                  </ImageModelSelect>
-                ) : (
-                  <ModelSelector onSelect={onSelectModel}>
+
+              {!settings.agentMode &&
+                <Tooltip
+                  label={t('Please select a model')}
+                  color="chatbox-error"
+                  opened={showSelectModelErrorTip}
+                  withArrow
+                >
+                  {sessionType === 'picture' ? (
+                    <ImageModelSelect onSelect={onSelectModel}>
+                      <span className="flex items-center text-sm opacity-70 cursor-pointer bg-transparent hover:bg-slate-400/25 h-6">
+                        {providers.find((p) => p.id === model?.provider)?.name || model?.provider || t('Select Model')}
+                        <IconSelector size={16} className="opacity-50" />
+                      </span>
+                    </ImageModelSelect>
+                  ) : (
+                    <ModelSelector onSelect={onSelectModel}>
+                      <Flex
+                        gap="xxs"
+                        px={isSmallScreen ? 0 : 'xs'}
+                        align="center"
+                        className={cn('cursor-pointer hover:bg-slate-400/25 rounded-lg', !isSmallScreen && 'py-1')}
+                      >
+                        {!!model && <ProviderImageIcon size={isSmallScreen ? 20 : 24} provider={model.provider} />}
+                        <Text size={isSmallScreen ? 'xs' : 'sm'} className="line-clamp-1">
+                          {modelSelectorDisplayText}
+                        </Text>
+                        <IconSelector
+                          size={20}
+                          className="flex-[0_0_auto] text-[var(--mantine-color-chatbox-tertiary-text)]"
+                        />
+                      </Flex>
+                    </ModelSelector>
+                  )}
+                </Tooltip>
+
+              }
+              {
+                settings.agentMode &&
+                <Tooltip
+                  label={t('Please select an agent')}
+                  color="chatbox-error"
+                  opened={false}
+                  withArrow
+                >
+                  <AgentProviderSelector onSelect={onSelectAgentProvider}>
                     <Flex
                       gap="xxs"
                       px={isSmallScreen ? 0 : 'xs'}
                       align="center"
                       className={cn('cursor-pointer hover:bg-slate-400/25 rounded-lg', !isSmallScreen && 'py-1')}
                     >
-                      {!!model && <ProviderImageIcon size={isSmallScreen ? 20 : 24} provider={model.provider} />}
                       <Text size={isSmallScreen ? 'xs' : 'sm'} className="line-clamp-1">
-                        {modelSelectorDisplayText}
+                        {agentProviderDisplayText}
                       </Text>
                       <IconSelector
                         size={20}
                         className="flex-[0_0_auto] text-[var(--mantine-color-chatbox-tertiary-text)]"
                       />
                     </Flex>
-                  </ModelSelector>
-                )}
-              </Tooltip>
-              <Tooltip
-                label={t('Please select an agent')}
-                color="chatbox-error"
-                opened={false}
-                withArrow
-              >
-                <AgentProviderSelector onSelect={onSelectAgentProvider}>
-                  <Flex
-                    gap="xxs"
-                    px={isSmallScreen ? 0 : 'xs'}
-                    align="center"
-                    className={cn('cursor-pointer hover:bg-slate-400/25 rounded-lg', !isSmallScreen && 'py-1')}
-                  >
-                    <Text size={isSmallScreen ? 'xs' : 'sm'} className="line-clamp-1">
-                      {agentProviderDisplayText}
-                    </Text>
-                    <IconSelector
-                      size={20}
-                      className="flex-[0_0_auto] text-[var(--mantine-color-chatbox-tertiary-text)]"
-                    />
-                  </Flex>
-                </AgentProviderSelector>
-              </Tooltip>
+                  </AgentProviderSelector>
+                </Tooltip>
+
+              }
               <ActionIcon
                 disabled={disableSubmit && !generating}
                 radius={18}
