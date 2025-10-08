@@ -106,13 +106,18 @@
         "type": "function",
         "z": "ec288c38e877de1a",
         "name": "function 2",
-        "func": "msg.payload = \"SOME MEANINGFULL DATA\";\nnode.warn(msg);\n// msg.handleCallback() // data\nreturn msg;",
+        "func": "msg.payload = \"SOME MEANINGFULL DATA\";\nnode.warn(\"A2AClient\")\nnode.warn(a2aJsSdkClient)\nnode.warn(msg);\nconst { A2AClient } = a2aJsSdkClient;\n\n\ntry {\n    const a2aRequest = { ...msg.chatboxPayload.a2aRequests.params }\n    const client = await A2AClient.fromCardUrl(msg.chatboxPayload.options.baseUrl + \"/.well-known/agent-card.json\");\n    const result = await client.sendMessage(a2aRequest);\n    node.warn(result);\n}\ncatch (e) {\n    node.warn(e);\n}\n\nmsg.callbackSuccess({\n    message: \"YAYAYAYYAY\"\n})\n// msg.callBackSuccess(\"Result\");\n// msg.handleCallback() // data\n// return msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
-        "libs": [],
+        "libs": [
+            {
+                "var": "a2aJsSdkClient",
+                "module": "@a2a-js/sdk/client"
+            }
+        ],
         "x": 480,
         "y": 340,
         "wires": [
@@ -155,6 +160,39 @@
             [
                 "aed326a2382aa0a7"
             ]
+        ]
+    },
+    {
+        "id": "86f0259d49687ad9",
+        "type": "catch",
+        "z": "ec288c38e877de1a",
+        "name": "",
+        "scope": null,
+        "uncaught": false,
+        "x": 560,
+        "y": 80,
+        "wires": [
+            [
+                "b18a12f279c66173"
+            ]
+        ]
+    },
+    {
+        "id": "b18a12f279c66173",
+        "type": "function",
+        "z": "ec288c38e877de1a",
+        "name": "function 4",
+        "func": "msg.callbackError(\"ERROR FROM NODE_RED\")\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 740,
+        "y": 80,
+        "wires": [
+            []
         ]
     }
 ]

@@ -92,8 +92,6 @@ import * as atoms from './atoms'
 import * as scrollActions from './scrollActions'
 import { clearConversations, copySession, createSession, getSession, saveSession } from './sessionStorageMutations'
 import * as settingActions from './settingActions'
-import Custom from 'src/shared/models/customer'
-import { A2AClient } from 'src/shared/utils/a2a_util'
 
 /**
  * 创建一个新的会话

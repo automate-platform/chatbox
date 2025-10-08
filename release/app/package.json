@@ -15,6 +15,7 @@
     "link-modules": "node -r ts-node/register ../../.erb/scripts/link-modules.ts"
   },
   "dependencies": {
+    "@a2a-js/sdk": "^0.3.4",
     "@libsql/client": "^0.15.6",
     "node-red": "^4.0.8"
   },

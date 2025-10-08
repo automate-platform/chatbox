@@ -19,6 +19,7 @@ import SiliconFlow from './siliconflow'
 import type { ModelInterface } from './types'
 import VolcEngine from './volcengine'
 import XAI from './xai'
+import AgentProvider from './customer'
 
 export function getProviderSettings(setting: Settings) {
   console.debug('getModel', setting.provider, setting.modelId)
@@ -59,7 +60,23 @@ export function getModel(setting: Settings, config: Config, dependencies: ModelD
       modelId: setting.modelId!,
     }
   }
-
+  if (setting.agentMode) {
+    return new AgentProvider(
+      {
+        apiKey: providerSetting.apiKey || '',
+        apiHost: formattedApiHost,
+        model: model,
+        dalleStyle: setting.dalleStyle || 'vivid',
+        temperature: setting.temperature,
+        topP: setting.topP,
+        maxTokens: setting.maxTokens,
+        injectDefaultMetadata: setting.injectDefaultMetadata,
+        useProxy: false, // 之前的openaiUseProxy已经没有在使用，直接写死false
+        stream: setting.stream,
+      },
+      dependencies
+    )
+  }
   switch (provider) {
     case ModelProviderEnum.ChatboxAI:
       return new ChatboxAI(
@@ -273,18 +290,17 @@ export function getModel(setting: Settings, config: Config, dependencies: ModelD
       )
     default:
       if (providerBaseInfo.isCustom) {
-        return new Custom(
+        return new CustomOpenAI(
           {
             apiKey: providerSetting.apiKey || '',
             apiHost: formattedApiHost,
-            model: model,
-            dalleStyle: setting.dalleStyle || 'vivid',
+            apiPath: providerSetting.apiPath || '',
+            model,
             temperature: setting.temperature,
             topP: setting.topP,
             maxTokens: setting.maxTokens,
-            injectDefaultMetadata: setting.injectDefaultMetadata,
-            useProxy: false, // 之前的openaiUseProxy已经没有在使用，直接写死false
             stream: setting.stream,
+            useProxy: providerSetting.useProxy,
           },
           dependencies
         )

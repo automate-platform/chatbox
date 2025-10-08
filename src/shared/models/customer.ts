@@ -28,8 +28,8 @@ interface Options {
     stream?: boolean
 }
 
-export default class Custom extends AbstractAISDKModel {
-    public name = 'Custom'
+export default class AgentProvider extends AbstractAISDKModel {
+    public name = 'Agent'
     public options: Options
     public a2aClient: A2AClientInterface = new A2AClient();
     public platform: Platform = platform;
@@ -162,28 +162,8 @@ export default class Custom extends AbstractAISDKModel {
             //TODO: ADD APP ID
             let nodeRedResult = null;
             const triggerNode = this.selectedAgent?.triggerNodeName;
-            if (platform instanceof DesktopPlatform && this.platform.triggerNode && triggerNode && !isEmpty(triggerNode)) {
-                console.log("TRIGGERED");
-                // callback defined here
-                nodeRedResult = await this.platform.triggerNode(triggerNode, {
-                    coreMessages: {...coreMessages},
-                    options: {
-                        sessionId: options.sessionId,
-                        // ADD HERE
-                    }
-                });
-                console.log("NODERED SUCCESS", nodeRedResult);
-            }
-            else {
-                //DO SOMETHING ABOUT THIS? -> GO BACK TO MODEL MODE @@
-                throw new Error("UNABLE TO TRIGGER NODERED")
-            }
             console.log("NODERD", nodeRedResult)
             const a2aOptions = {...options};
-            if (nodeRedResult) {
-                //@ts-ignore
-                a2aOptions.messageMetadata = nodeRedResult;
-            }
             const transformedRequest = await this.transformer.transformRequestOut(coreMessages, {
                 streaming: this.options.stream || false,
                 contextId: options.sessionId,
@@ -193,8 +173,28 @@ export default class Custom extends AbstractAISDKModel {
                 console.log(this.a2aClient, this.selectedAgent?.baseUrl);
                 throw new Error("A2AClient Is Null");
             }
-            const result = await this.a2aClient.sendA2AMessageSingle(transformedRequest, this.selectedAgent.baseUrl);
-            const convertedResult: StreamTextResult = await this.transformer.transformResponseIn(result);
+            if (platform instanceof DesktopPlatform && this.platform.triggerNode && triggerNode && !isEmpty(triggerNode)) {
+                console.log("TRIGGERED");
+                // callback defined here
+                nodeRedResult = await this.platform.triggerNode(triggerNode, {
+                    coreMessages: {...coreMessages},
+                    a2aRequests: {...transformedRequest},
+                    options: {
+                        sessionId: options.sessionId,
+                        baseUrl: this.selectedAgent.baseUrl
+                        // ADD HERE
+                    }
+                });
+                console.log("NODERED SUCCESS", nodeRedResult);
+            }
+            else {
+                //DO SOMETHING ABOUT THIS? -> GO BACK TO MODEL MODE @@
+                throw new Error("UNABLE TO TRIGGER NODERED")
+            }
+            if (!nodeRedResult) {
+                throw new Error("NODE-RED ERROR");
+            }
+            const convertedResult: StreamTextResult = await this.transformer.transformResponseIn({...nodeRedResult.payload});
             options.onResultChange?.({ contentParts: convertedResult.contentParts })
             return convertedResult
         } catch (error) {

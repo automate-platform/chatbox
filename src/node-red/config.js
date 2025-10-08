@@ -1,6 +1,6 @@
 const { getResourcePath, getPublicPath } = require('../shared/utils/path.util')
 const logger = require('electron-log')
-
+const path = require('path')
 const nrLogLevels = {
   // eslint-disable-line no-unused-vars
   10: 'error',

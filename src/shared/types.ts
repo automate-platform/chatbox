@@ -447,7 +447,9 @@ export interface Settings extends SessionSettings {
   shortcuts: ShortcutSetting
 
   extension: ExtensionSettings
-  mcp: MCPSettings
+  mcp: MCPSettings,
+
+  agentMode?: boolean
 }
 
 

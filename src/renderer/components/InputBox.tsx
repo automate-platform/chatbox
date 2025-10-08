@@ -15,6 +15,7 @@ import {
   IconSelector,
   IconVocabulary,
   IconWorld,
+  IconRobot
 } from '@tabler/icons-react'
 import { useAtom, useAtomValue } from 'jotai'
 import _, { isEmpty, pick } from 'lodash'
@@ -48,6 +49,7 @@ import MCPMenu from './mcp/MCPMenu'
 import { Keys } from './Shortcut'
 import { useAgentProviders } from '@/hooks/useAgentProviders'
 import AgentProviderSelector from './AgentProviderSelector'
+import { useSettings } from '@/hooks/useSettings'
 
 export type InputBoxPayload = {
   input: string
@@ -138,6 +140,8 @@ const InputBox = forwardRef<InputBoxRef, InputBoxProps>(
       [currentSessionId, isNewSession, setSessionKnowledgeBaseMap, setNewSessionState]
     )
     const [webBrowsingMode, setWebBrowsingMode] = useAtom(atoms.inputBoxWebBrowsingModeAtom)
+
+    const {settings, setSettings} = useSettings();
 
     const [links, setLinks] = useAtom(atoms.inputBoxLinksAtom)
 
@@ -623,6 +627,31 @@ const InputBox = forwardRef<InputBoxRef, InputBoxProps>(
                       <IconWorld strokeWidth={1.8} />
                     </ActionIcon>
                   </Tooltip>
+                  <Tooltip
+                    label={
+                      <Stack align="center" gap="xxs" pb="xxs">
+                        <div className="whitespace-nowrap">{t('Agent Mode')}</div>
+                        {/* <Flex align="center">
+                          <Keys keys={shortcuts.inputBoxWebBrowsingMode.split('+')} size="small" opacity={0.7} />
+                        </Flex> */}
+                      </Stack>
+                    }
+                    withArrow
+                    position="top">
+                       <ActionIcon
+                      size="24px"
+                      variant="subtle"
+                      color={settings.agentMode ? 'chatbox-brand' : 'chatbox-secondary'}
+                      onClick={() => {
+                        setSettings({
+                          agentMode: !settings.agentMode
+                        })
+                        dom.focusMessageInput()
+                      }}
+                    >
+                      <IconRobot strokeWidth={1.8} />
+                    </ActionIcon>
+                  </Tooltip>
                   {featureFlags.mcp && (
                     <MCPMenu>
                       {(enabledTools) =>
@@ -778,7 +807,7 @@ const InputBox = forwardRef<InputBoxRef, InputBoxProps>(
                 opened={false}
                 withArrow
               >
-               <AgentProviderSelector onSelect={onSelectAgentProvider}>
+                <AgentProviderSelector onSelect={onSelectAgentProvider}>
                   <Flex
                     gap="xxs"
                     px={isSmallScreen ? 0 : 'xs'}
