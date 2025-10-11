@@ -177,4 +177,4 @@ electron-builder.env
 .env.sentry-build-plugin
 
 package-lock.json
-public/
+public/node-red
