@@ -184,7 +184,8 @@ export type SessionSettings = Partial<{
   dalleStyle: 'vivid' | 'natural'
   imageGenerateNum: number // 生成图片的数量
   providerOptions?: ProviderOptions,
-  agentProviderId: string
+  agentProviderId: string,
+  agentMode?: boolean
 }>
 
 export interface Session {
@@ -448,8 +449,6 @@ export interface Settings extends SessionSettings {
 
   extension: ExtensionSettings
   mcp: MCPSettings,
-
-  agentMode?: boolean
 }
 
 

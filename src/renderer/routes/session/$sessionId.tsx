@@ -37,6 +37,7 @@ function RouteComponent() {
       }
     }
   }, [currentSession])
+  const agentMode = currentSession?.settings?.agentMode
   useEffect(() => {
     setTimeout(() => {
       scrollActions.scrollToBottom('auto') // 每次启动时自动滚动到底部

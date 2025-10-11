@@ -96,9 +96,7 @@
         "x": 280,
         "y": 340,
         "wires": [
-            [
-                "b2d3b7095984b880"
-            ]
+            []
         ]
     },
     {
@@ -106,7 +104,7 @@
         "type": "function",
         "z": "ec288c38e877de1a",
         "name": "DEMO A2A Request",
-        "func": "const { A2AClient } = a2aJsSdkClient;\nconst a2aRequest = { ...msg.chatboxPayload.a2aRequests.params }\n\n\ntry {\n    const client = await A2AClient.fromCardUrl(msg.chatboxPayload.options.baseUrl + \"/.well-known/agent-card.json\");\n    const result = await client.sendMessage(a2aRequest);\n    node.warn(result);\n    msg.callbackSuccess({\n        ...result\n    })\n}\ncatch (e) {\n    node.warn(e);\n    msg.callbackError(e.message);\n}\nreturn msg;",
+        "func": "const { A2AClient } = a2aJsSdkClient;\nconst a2aRequest = { ...msg.chatboxPayload.a2aRequests.params }\n\n\ntry {\n    node.warn(\"TRIGGERED\");\n    const client = await A2AClient.fromCardUrl(msg.chatboxPayload.options.baseUrl + \"/.well-known/agent-card.json\");\n    const result = await client.sendMessage(a2aRequest);\n    node.warn(result);\n    msg.callbackSuccess({\n        ...result\n    })\n}\ncatch (e) {\n    node.warn(e);\n    msg.callbackError(e.message);\n}\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -141,5 +139,16 @@
         "x": 940,
         "y": 340,
         "wires": []
+    },
+    {
+        "id": "c694b2ad9220d45d",
+        "type": "chatbox-trigger-node",
+        "z": "ec288c38e877de1a",
+        "name": "",
+        "x": 150,
+        "y": 520,
+        "wires": [
+            []
+        ]
     }
 ]

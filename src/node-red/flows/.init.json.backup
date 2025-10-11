@@ -96,17 +96,15 @@
         "x": 280,
         "y": 340,
         "wires": [
-            [
-                "b2d3b7095984b880"
-            ]
+            []
         ]
     },
     {
         "id": "b2d3b7095984b880",
         "type": "function",
         "z": "ec288c38e877de1a",
-        "name": "function 2",
-        "func": "msg.payload = \"SOME MEANINGFULL DATA\";\nnode.warn(\"A2AClient\")\nnode.warn(a2aJsSdkClient)\nnode.warn(msg);\nconst { A2AClient } = a2aJsSdkClient;\n\n\ntry {\n    const a2aRequest = { ...msg.chatboxPayload.a2aRequests.params }\n    const client = await A2AClient.fromCardUrl(msg.chatboxPayload.options.baseUrl + \"/.well-known/agent-card.json\");\n    const result = await client.sendMessage(a2aRequest);\n    node.warn(result);\n}\ncatch (e) {\n    node.warn(e);\n}\n\nmsg.callbackSuccess({\n    message: \"YAYAYAYYAY\"\n})\n// msg.callBackSuccess(\"Result\");\n// msg.handleCallback() // data\n// return msg;",
+        "name": "DEMO A2A Request",
+        "func": "const { A2AClient } = a2aJsSdkClient;\nconst a2aRequest = { ...msg.chatboxPayload.a2aRequests.params }\n\n\ntry {\n    node.warn(\"TRIGGERED\");\n    const client = await A2AClient.fromCardUrl(msg.chatboxPayload.options.baseUrl + \"/.well-known/agent-card.json\");\n    const result = await client.sendMessage(a2aRequest);\n    node.warn(result);\n    msg.callbackSuccess({\n        ...result\n    })\n}\ncatch (e) {\n    node.warn(e);\n    msg.callbackError(e.message);\n}\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -118,11 +116,11 @@
                 "module": "@a2a-js/sdk/client"
             }
         ],
-        "x": 480,
+        "x": 520,
         "y": 340,
         "wires": [
             [
-                "0eb4f7a82c7844d0"
+                "aed326a2382aa0a7"
             ]
         ]
     },
@@ -138,61 +136,8 @@
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 820,
+        "x": 940,
         "y": 340,
         "wires": []
-    },
-    {
-        "id": "0eb4f7a82c7844d0",
-        "type": "function",
-        "z": "ec288c38e877de1a",
-        "name": "function 3",
-        "func": "\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 660,
-        "y": 340,
-        "wires": [
-            [
-                "aed326a2382aa0a7"
-            ]
-        ]
-    },
-    {
-        "id": "86f0259d49687ad9",
-        "type": "catch",
-        "z": "ec288c38e877de1a",
-        "name": "",
-        "scope": null,
-        "uncaught": false,
-        "x": 560,
-        "y": 80,
-        "wires": [
-            [
-                "b18a12f279c66173"
-            ]
-        ]
-    },
-    {
-        "id": "b18a12f279c66173",
-        "type": "function",
-        "z": "ec288c38e877de1a",
-        "name": "function 4",
-        "func": "msg.callbackError(\"ERROR FROM NODE_RED\")\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 740,
-        "y": 80,
-        "wires": [
-            []
-        ]
     }
 ]
