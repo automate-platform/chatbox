@@ -45,7 +45,7 @@ win:
       arch:
         - x64
         - arm64
-  artifactName: ${productName}-${version}-${os}-Setup.${ext}
+  artifactName: ${productName}-${version}-${os}-${arch}.${ext}
 
 
 nsis:
