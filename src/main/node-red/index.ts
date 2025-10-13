@@ -41,16 +41,12 @@ export class NodeRedImplementation implements NodeRedInterface {
     public async invokeNodeRed(name?: string, payload?: any): Promise<any> {
         try {
             log.warn("Invoke node red");
-            // if (typeof callback === 'function') {
-            //     callback(`Invoked Node-RED with name: ${name}`);
-            // }
             const nodeDef = await this.getNodeByName(name);
             if (!nodeDef) {
                 log.warn("NODE DEF IS NULL", name);
                 return null;
             }
             const nodeId = nodeDef.id || "";
-            //TODO: ADD TYPES DEFINITION HERE
             const nodeImp = this._RED_.nodes.getNode(nodeId);
             const finalMessage = await new Promise<any>((resolve, reject) => {
                 const msg = {
@@ -65,11 +61,6 @@ export class NodeRedImplementation implements NodeRedInterface {
                     reject(err);
                 }
             });
-            // log.warn(nodeImp, nodeImp.receive);
-
-            // const finalResult = new Promise((resolve, reject) => {
-
-            // })
             return {
                 result: `Invoked Node-RED with name ${name}`,
                 payload: finalMessage
