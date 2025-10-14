@@ -737,7 +737,7 @@ export async function submitNewUserMessage(params: {
       ...newAssistantMsg,
       generating: false,
       cancel: undefined,
-      model: await getModelDisplayName(settings, 'chat'),
+      model: settings.agentMode ? "Agent" : await getModelDisplayName(settings, 'chat'), // TODO: Add an utils to get model name
       contentParts: [{ type: 'text', text: '' }],
       errorCode,
       error: `${error.message}`, // 这么写是为了避免类型问题
@@ -788,7 +788,7 @@ export async function generate(
     // pictures: session.type === 'picture' ? createLoadingPictures(settings.imageGenerateNum) : targetMsg.pictures,
     cancel: undefined,
     aiProvider: settings.provider,
-    model: await getModelDisplayName(settings, session.type || 'chat'),
+    model: settings.agentMode ? "Agent" : await getModelDisplayName(settings, session.type || 'chat'),
     style: session.type === 'picture' ? settings.dalleStyle : undefined,
     generating: true,
     errorCode: undefined,

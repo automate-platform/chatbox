@@ -1,10 +1,10 @@
 import { createOpenAI } from '@ai-sdk/openai'
-import { APICallError, CoreMessage, extractReasoningMiddleware, ToolSet, wrapLanguageModel } from 'ai'
+import { APICallError, CoreMessage, experimental_generateImage as generateImage , extractReasoningMiddleware, ImageModel, ToolSet, wrapLanguageModel } from 'ai'
 import type { AgentCard, MessageContentParts, ProviderModelInfo, StreamTextResult } from '../types'
 import type { ModelDependencies } from '../types/adapters'
 import { normalizeOpenAIApiHostAndPath } from '../utils/llm_utils'
 import AbstractAISDKModel, { CallSettings } from './abstract-ai-sdk'
-import type { CallChatCompletionOptions } from './types'
+import type { CallChatCompletionOptions, ModelInterface } from './types'
 import { createFetchWithProxy, fetchRemoteModels } from './utils/fetch-proxy'
 import { ApiError, ChatboxAIAPIError } from './errors'
 import { createA2ATransformer } from '../transformer/a2aTransformers'
@@ -16,10 +16,10 @@ import platform from '@/platform'
 import DesktopPlatform from '@/platform/desktop_platform'
 
 interface Options {
-    apiKey: string
-    apiHost: string
-    model: ProviderModelInfo
-    dalleStyle: 'vivid' | 'natural'
+    apiKey?: string
+    apiHost?: string
+    model?: ProviderModelInfo
+    dalleStyle?: 'vivid' | 'natural'
     temperature?: number
     topP?: number
     maxTokens?: number
@@ -27,82 +27,46 @@ interface Options {
     useProxy: boolean
     stream?: boolean
 }
-
-export default class AgentProvider extends AbstractAISDKModel {
+//   name: string
+//   modelId: string
+//   isSupportVision(): boolean
+//   isSupportToolUse(scope?: ToolUseScope): boolean
+//   isSupportSystemMessage(): boolean
+//   chat: (messages: CoreMessage[], options: CallChatCompletionOptions) => Promise<StreamTextResult>
+//   paint: (prompt: string, num: number, callback?: (picBase64: string) => any, signal?: AbortSignal) => Promise<string[]>
+export default class AgentProvider implements ModelInterface {
     public name = 'Agent'
     public options: Options
+    public modelId = ''
     public a2aClient: A2AClientInterface = new A2AClient();
     public platform: Platform = platform;
     public transformer = createA2ATransformer();
     private settings = getCurrentSessionMergedSettings();
+    private dependencies: ModelDependencies
     private selectedAgent: AgentCard | null = null;
     constructor(options: Options, dependencies: ModelDependencies) {
-        super(options, dependencies)
-        const { apiHost } = normalizeOpenAIApiHostAndPath(options)
-        this.options = { ...options, apiHost }
+        this.options = { ...options }
         const agentProviders = this.settings.agentProviders;
-        console.log("MODEL GENERATED",this.settings);
+        this.dependencies = dependencies
+        console.log("MODEL GENERATED", this.settings);
         console.log(platform instanceof DesktopPlatform, platform.triggerNode)
         this.selectedAgent = agentProviders?.find(item => item.chatboxSettingId === this.settings.agentProviderId && !isEmpty(item.chatboxSettingId)) || null;
     }
 
-    static isSupportTextEmbedding() {
-        return true
+    public isSupportToolUse() {
+        return false
     }
-
-    protected getProvider() {
-        return createOpenAI({
-            apiKey: this.options.apiKey,
-            baseURL: this.options.apiHost,
-            fetch: createFetchWithProxy(this.options.useProxy, this.dependencies),
-            headers: this.options.apiHost.includes('openrouter.ai')
-                ? {
-                    'HTTP-Referer': 'https://chatboxai.app',
-                    'X-Title': 'Chatbox AI',
-                }
-                : undefined,
-        })
+    public isSupportVision() {
+        return false
     }
-
-    protected getChatModel() {
-        const provider = this.getProvider()
-        return wrapLanguageModel({
-            model: provider.chat(this.options.model.modelId),
-            middleware: extractReasoningMiddleware({ tagName: 'think' }),
-        })
+    public isSupportReasoning() {
+        return true;
     }
-
-    protected getImageModel() {
-        const provider = this.getProvider()
-        return provider.image('dall-e-3')
+    public isSupportTextEmbedding() {
+        return false;
     }
-
-    protected getCallSettings(options: CallChatCompletionOptions) {
-        const isModelSupportReasoning = this.isSupportReasoning()
-        let providerOptions = {}
-        if (isModelSupportReasoning) {
-            providerOptions = {
-                openai: options.providerOptions?.openai || {},
-            }
-        }
-
-        return {
-            temperature: this.options.temperature,
-            topP: this.options.topP,
-            maxTokens: this.options.maxTokens,
-            providerOptions,
-        }
-    }
-
-    public listModels() {
-        return fetchRemoteModels(
-            {
-                apiHost: this.options.apiHost,
-                apiKey: this.options.apiKey,
-                useProxy: this.options.useProxy,
-            },
-            this.dependencies
-        )
+    public isSupportSystemMessage() {
+        return true;
     }
     public async chat(messages: CoreMessage[], options: CallChatCompletionOptions): Promise<StreamTextResult> {
         console.log("CHAT CALLED");
@@ -163,7 +127,7 @@ export default class AgentProvider extends AbstractAISDKModel {
             let nodeRedResult = null;
             const triggerNode = this.selectedAgent?.triggerNodeName;
             console.log("NODERD", nodeRedResult)
-            const a2aOptions = {...options};
+            const a2aOptions = { ...options };
             const transformedRequest = await this.transformer.transformRequestOut(coreMessages, {
                 streaming: this.options.stream || false,
                 contextId: options.sessionId,
@@ -177,8 +141,8 @@ export default class AgentProvider extends AbstractAISDKModel {
                 console.log("TRIGGERED");
                 // callback defined here
                 nodeRedResult = await this.platform.triggerNode(triggerNode, {
-                    coreMessages: {...coreMessages},
-                    a2aRequests: {...transformedRequest},
+                    coreMessages: { ...coreMessages },
+                    a2aRequests: { ...transformedRequest },
                     options: {
                         sessionId: options.sessionId,
                         baseUrl: this.selectedAgent.baseUrl
@@ -194,7 +158,7 @@ export default class AgentProvider extends AbstractAISDKModel {
             if (!nodeRedResult) {
                 throw new Error("NODE-RED ERROR");
             }
-            const convertedResult: StreamTextResult = await this.transformer.transformResponseIn({...nodeRedResult.payload});
+            const convertedResult: StreamTextResult = await this.transformer.transformResponseIn({ ...nodeRedResult.payload });
             options.onResultChange?.({ contentParts: convertedResult.contentParts })
             return convertedResult
         } catch (error) {
@@ -214,5 +178,30 @@ export default class AgentProvider extends AbstractAISDKModel {
             throw error
         }
         throw new ApiError(`Error from ${this.name}${context}: ${error}`)
+    }
+    protected getImageModel(): ImageModel | null {
+        return null
+    }
+    public async paint(
+        prompt: string,
+        num: number,
+        callback?: (picBase64: string) => void,
+        signal?: AbortSignal
+    ): Promise<string[]> {
+        const imageModel = this.getImageModel()
+        if (!imageModel) {
+            throw new ApiError('Provider doesnt support image generation')
+        }
+        const result = await generateImage({
+            model: imageModel,
+            prompt,
+            n: num,
+            abortSignal: signal,
+        })
+        const dataUrls = result.images.map((image:any) => `data:${image.mimeType};base64,${image.base64}`)
+        for (const dataUrl of dataUrls) {
+            callback?.(dataUrl)
+        }
+        return dataUrls
     }
 }

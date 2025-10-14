@@ -42,6 +42,21 @@ export function getProviderSettings(setting: Settings) {
 
 export function getModel(setting: Settings, config: Config, dependencies: ModelDependencies): ModelInterface {
   console.debug('getModel', setting.provider, setting.modelId)
+  if (setting.agentMode) {
+    console.log("GET AGENT")
+    return new AgentProvider(
+      {
+        dalleStyle: setting.dalleStyle || 'vivid',
+        temperature: setting.temperature,
+        topP: setting.topP,
+        maxTokens: setting.maxTokens,
+        injectDefaultMetadata: setting.injectDefaultMetadata,
+        useProxy: false, // 之前的openaiUseProxy已经没有在使用，直接写死false
+        stream: setting.stream,
+      },
+      dependencies
+    )
+  }
   const provider = setting.provider
   if (!provider) {
     throw new Error('Model provider must not be empty.')
@@ -59,23 +74,6 @@ export function getModel(setting: Settings, config: Config, dependencies: ModelD
     model = {
       modelId: setting.modelId!,
     }
-  }
-  if (setting.agentMode) {
-    return new AgentProvider(
-      {
-        apiKey: providerSetting.apiKey || '',
-        apiHost: formattedApiHost,
-        model: model,
-        dalleStyle: setting.dalleStyle || 'vivid',
-        temperature: setting.temperature,
-        topP: setting.topP,
-        maxTokens: setting.maxTokens,
-        injectDefaultMetadata: setting.injectDefaultMetadata,
-        useProxy: false, // 之前的openaiUseProxy已经没有在使用，直接写死false
-        stream: setting.stream,
-      },
-      dependencies
-    )
   }
   switch (provider) {
     case ModelProviderEnum.ChatboxAI:

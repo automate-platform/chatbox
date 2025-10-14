@@ -1,27 +1,83 @@
 <script type="text/javascript">
-    RED.nodes.registerType('chatbox-trigger-node',{
-        category: 'function',
-        color: '#a6bbcf',
-        outputs: 1,
-        label: function() {
-            return this.id || this.name
-        },
-        defaults: {
-            nodeId: { value: "" }
-        },
-        oneditprepare: function () {
-            $("#node-input-nodeId").val(this.id);
+    (function () {
+        function validateName(v) {
+            return typeof v === "string" && /^[A-Za-z0-9_-]{1,50}$/.test(v.trim());
         }
-    });
+
+        RED.nodes.registerType('chatbox-trigger-node', {
+            category: 'function',
+            color: '#a6bbcf',
+            outputs: 1,
+            icon: "font-awesome/fa-comment",
+            label: function () {
+                return this.name || "chatbox-trigger-node";
+            },
+            defaults: {
+                name: {
+                    value: "_DEFAULT_",
+                    validate: function (v) { return validateName(v); }
+                }
+            },
+            onadd: function () {
+                this.name = this.id;
+            },
+            oneditprepare: function () {
+                if (!this.name || this.name.trim() === "") {
+                    $("#node-input-name").val(this.id);
+                } else {
+                    $("#node-input-name").val(this.name);
+                }
+                $("#node-input-name-verify").on("click", function () {
+                    const val = $("#node-input-name").val();
+                    const ok = validateName(val);
+                    const $msg = $("#node-input-name-msg");
+                    if (ok) {
+                        $msg.text("Valid name ✓").removeClass("node-input-error").addClass("node-input-ok");
+                    } else {
+                        $msg.text("Only letters, numbers, underscores, or hyphens. No spaces allowed.")
+                            .removeClass("node-input-ok").addClass("node-input-error");
+                    }
+                });
+            },
+
+            oneditsave: function () {
+                const val = $("#node-input-name").val() || this.id;
+                if (!this._def.defaults.name.validate(val)) {
+                    RED.notify("Invalid Name. No spaces allowed.", "error");
+                    throw new Error("Invalid name");
+                }
+            }
+        });
+    })();
 </script>
 
-<script type="text/html"  data-template-name="chatbox-trigger-node">
-    <div class="form-row">
-        <label for="node-input-nodeId"><i class="fa fa-tag"></i> Node Id</label>
-        <input type="text" id="node-input-nodeId" placeholder="nodeId" readonly>
-    </div>
+<style>
+    #node-input-name-msg {
+        margin-left: 8px;
+        font-size: 12px;
+    }
+
+    .node-input-ok {
+        color: #1a7f37;
+    }
+
+    .node-input-error {
+        color: #d21f3c;
+    }
+</style>
+
+<script type="text/html" data-template-name="chatbox-trigger-node">
+      <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-user"></i> Name </label>
+        <input type="text" id="node-input-name" style="width:60%;">
+        <button type="button" class="editor-button" id="node-input-name-verify" style="margin-left:6px;">Verify</button>
+        <span id="node-input-name-msg"></span>
+      </div>
 </script>
 
 <script type="text/html" data-help-name="chatbox-trigger-node">
-    <p>A simple node to trigger?</p>
+      <p>
+        Defaults to the node’s <code>id</code> if no name is set.  
+        Allowed characters: letters, digits, underscores (<code>_</code>) and hyphens (<code>-</code>); no spaces.
+      </p>
 </script>
