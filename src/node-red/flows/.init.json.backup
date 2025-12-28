@@ -144,9 +144,9 @@
         "id": "32014e4f66956c2c",
         "type": "chatbox-trigger-node",
         "z": "ec288c38e877de1a",
-        "name": "32014e4f66956c2c",
-        "x": 310,
-        "y": 380,
+        "name": "32014e4f66956c2cd",
+        "x": 290,
+        "y": 440,
         "wires": [
             []
         ]

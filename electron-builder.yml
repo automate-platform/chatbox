@@ -45,12 +45,14 @@ win:
       arch:
         - x64
         - arm64
-  artifactName: ${productName}-${version}-${os}-${arch}.${ext}
 
+portable:
+  artifactName: ${productName}-${version}-${os}-${arch}-portable.${ext}
 
 nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true
+  artifactName: ${productName}-${version}-${os}-${arch}-setup.${ext}
   include: assets/installer.nsh
 
 linux:

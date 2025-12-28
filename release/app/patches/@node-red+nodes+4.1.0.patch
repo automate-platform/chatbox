@@ -1,0 +1,13 @@
+diff --git a/node_modules/@node-red/nodes/core/network/21-httprequest.js b/node_modules/@node-red/nodes/core/network/21-httprequest.js
+index 0a3ac25..0159322 100644
+--- a/node_modules/@node-red/nodes/core/network/21-httprequest.js
++++ b/node_modules/@node-red/nodes/core/network/21-httprequest.js
+@@ -17,7 +17,7 @@
+ module.exports = async function(RED) {
+     "use strict";
+     const { getProxyForUrl, parseUrl } = require('./lib/proxyHelper');
+-    const { got } = await import('got')
++    const gotPkg = await import('got'); const got = gotPkg.got || gotPkg.default
+     const {CookieJar} = require("tough-cookie");
+     const { HttpProxyAgent, HttpsProxyAgent } = require('hpagent');
+     const FormData = require('form-data');

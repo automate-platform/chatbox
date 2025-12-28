@@ -150,5 +150,74 @@
         "wires": [
             []
         ]
+    },
+    {
+        "id": "8333dcf6e9aad83a",
+        "type": "http request",
+        "z": "ec288c38e877de1a",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "localhost:3000",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 370,
+        "y": 240,
+        "wires": [
+            [
+                "221aa95cd5d55485"
+            ]
+        ]
+    },
+    {
+        "id": "ddc5873596a94cf2",
+        "type": "inject",
+        "z": "ec288c38e877de1a",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 240,
+        "wires": [
+            [
+                "8333dcf6e9aad83a"
+            ]
+        ]
+    },
+    {
+        "id": "221aa95cd5d55485",
+        "type": "debug",
+        "z": "ec288c38e877de1a",
+        "name": "debug 3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 540,
+        "y": 240,
+        "wires": []
     }
 ]
